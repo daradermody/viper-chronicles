@@ -1,0 +1,30 @@
+# SHAWSHANK PUBLIC LICENSE
+
+> Version 1.0, September 2018
+
+> Copyright (C) 2025 Dara Dermody daradermody@gmail.com
+
+Everyone is permitted to copy and distribute verbatim or modified
+copies of this license document.
+
+> SHAWSHANK PUBLIC LICENSE
+> TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
+
+Permission is hereby granted to any person to do whatever they want with this
+software subject to the following condition:
+
+- You must tell me your favourite movie
+
+You must submit this information to the software owner using the provided
+email above.
+
+More than a single movie may be specified provided they are ordered in a list
+that clearly denotes the most favoured of movies therein.
+
+Favourite TV shows and anime may also be added as a suppliment to gain
+increased favour with the software onwer, but will not be accepted as a
+substitute.
+
+The software is provided without warranty. Using somebody else's code and
+bitching when it goes wrong makes you worse than Bill Lumbergh. Fix the
+problem yourself. Tom Hanks would submit the fix back to the original repo.

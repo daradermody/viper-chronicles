@@ -1,0 +1,15 @@
+node_modules
+
+out
+dist
+*.tgz
+
+.env
+.env.development.local
+.env.test.local
+.env.production.local
+.env.local
+
+*.tsbuildinfo
+.idea
+.DS_Store
