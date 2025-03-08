@@ -1,0 +1,37 @@
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+}
+
+body {
+  margin: 20px;
+  position: relative;
+}
+
+.video-spinner {
+  background-image: url("https://media.tenor.com/lUIQnRFbpscAAAAi/loading.gif");
+  background-repeat: no-repeat;
+  background-position: center;
+  max-height: 500px;
+  max-width: 800px;
+  border: 1px solid lightgray;
+  aspect-ratio: 4 / 3;
+  width: 100%;
+}
+
+.card-grid {
+  display: grid;
+  gap: 16px 32px;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 800px) {
+  .card-grid {
+    grid-template-columns: repeat(auto-fit, minmax(530px, 1fr))
+  }
+  .card-grid.small {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr))
+  }
+}
+
+
+

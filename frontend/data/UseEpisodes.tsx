@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Episode } from '../../episodes'
+import { Episode } from '../../types'
 
 export function useEpisodes() {
   const [episodes, setEpisodes] = useState<Episode[]>()

@@ -1,5 +1,5 @@
 import { createContext, ReactNode, useContext } from 'react'
-import { Episode } from '../../episodes'
+import { Episode } from '../../types'
 import { useEpisodes } from './UseEpisodes'
 import { useWatchedEpisodes } from './UseWatchedEpisodes'
 

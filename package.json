@@ -4,25 +4,26 @@
   "private": true,
   "license": "See LICENSE",
   "type": "module",
-  "main": "src/index.ts",
-  "module": "src/index.ts",
   "scripts": {
-    "dev": "bun --hot src/index.ts",
-    "build": "bun build ./src/index.html --outdir=dist --sourcemap --target=browser --minify --define:process.env.NODE_ENV='\"production\"' --env='BUN_PUBLIC_*'",
-    "start": "NODE_ENV=production bun src/index.ts"
+    "dev": "bun --hot devServer.ts",
+    "build": "bun build ./frontend/index.html --outdir=dist --public-path='/' --sourcemap --target=browser --minify --define:process.env.NODE_ENV='\"production\"' --env 'PUBLIC_*'"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@mui/icons-material": "^6.4.7",
     "@mui/material": "^6.4.7",
+    "clsx": "^2.1.1",
     "react": "^19",
     "react-dom": "^19",
-    "react-router-dom": "^7.2.0"
+    "react-router-dom": "^7.2.0",
+    "vercel": "^41.3.2"
   },
   "devDependencies": {
+    "@types/bun": "latest",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@types/bun": "latest"
-  }
+    "@types/redis": "^4.0.11"
+  },
+  "packageManager": "yarn@1.22.19+sha1.4ba7fc5c6e704fce2066ecbfb0b0d8976fe62447"
 }

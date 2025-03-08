@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 export default function Header() {
   return (
     <div style={{ marginBottom: '20px' }}>
-      <Typography variant="h2">
+      <Typography variant="h2" fontSize="3rem">
         <Link to="/" style={{ cursor: 'pointer', textDecoration: 'none', color: 'inherit' }}>
           Viper Chronicles
         </Link>
