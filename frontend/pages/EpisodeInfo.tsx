@@ -44,15 +44,25 @@ function Player({ episode }: { episode: Episode }) {
         allowFullScreen
       />
     )
-  } else {
+  } else if (episode.archiveOrgId) {
     return (
-      <div className="video-spinner">
+      <div className="video-container video-spinner">
         <iframe
           src={`https://archive.org/embed/${episode.archiveOrgId}`}
           style={{ height: '100%', width: '100%', border: 0 }}
           allowFullScreen
           allow="encrypted-media;"
         />
+      </div>
+    )
+  } else {
+    return (
+      <div
+        className="video-container"
+        style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}
+      >
+        <i>Couldn't find the video on YouTube or Archive.org</i>
+        <span style={{ fontSize: '4rem' }}>:(</span>
       </div>
     )
   }

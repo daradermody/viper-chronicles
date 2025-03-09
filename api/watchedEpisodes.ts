@@ -9,11 +9,11 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
-  const { archiveOrgId, watched } = await req.json() as { archiveOrgId: string, watched: boolean }
+  const { id, watched } = await req.json() as { id: string, watched: boolean }
   if (watched) {
-    await redis.sAdd(WATCHED_EPISODES_KEY, archiveOrgId)
+    await redis.sAdd(WATCHED_EPISODES_KEY, id)
   } else {
-    await redis.sRem(WATCHED_EPISODES_KEY, archiveOrgId)
+    await redis.sRem(WATCHED_EPISODES_KEY, id)
   }
   return new Response(null, { status: 204 })
 }

@@ -7,15 +7,18 @@ body {
   position: relative;
 }
 
-.video-spinner {
-  background-image: url("https://media.tenor.com/lUIQnRFbpscAAAAi/loading.gif");
-  background-repeat: no-repeat;
-  background-position: center;
+.video-container {
   max-height: 500px;
   max-width: 800px;
   border: 1px solid lightgray;
   aspect-ratio: 4 / 3;
   width: 100%;
+}
+
+.video-spinner {
+  background-image: url("https://media.tenor.com/lUIQnRFbpscAAAAi/loading.gif");
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
 .card-grid {

@@ -22,12 +22,12 @@ export function useWatchedEpisodes() {
     }
   }, [setWatchedEpisodes, setError, setLoading])
 
-  async function setWatched(archiveOrgId: string, watched: boolean) {
+  async function setWatched(id: string, watched: boolean) {
     try {
-      setWatchedEpisodes(prev => watched ? [...(prev || []), archiveOrgId] : (prev || []).filter(id => id !== archiveOrgId))
+      setWatchedEpisodes(prevIds => watched ? [...(prevIds || []), id] : (prevIds || []).filter(prevId => prevId !== id))
       await fetch(`/api/watchedEpisodes`, {
         method: 'POST',
-        body: JSON.stringify({ archiveOrgId, watched }),
+        body: JSON.stringify({ id, watched }),
         headers: { 'Content-Type': 'application/json' },
       })
       await fetchWatchedEpisodes()

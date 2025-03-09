@@ -40,7 +40,7 @@ function SeasonList() {
     }
     const watchedEpisodesBySeason: Record<string, Episode[]> = {}
     for (const [season, episodes] of Object.entries(episodesBySeason)) {
-      watchedEpisodesBySeason[season] = episodes?.filter(episode => watchedEpisodes.includes(episode.archiveOrgId)) || []
+      watchedEpisodesBySeason[season] = episodes?.filter(episode => watchedEpisodes.includes(episode.id)) || []
     }
     return watchedEpisodesBySeason
   }, [watchedEpisodes, episodesBySeason])
