@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react'
 import Header from '../Header'
 import { useData } from '../data/DataProvider'
 import { Episode } from '../../types'
+import {Typography} from "@mui/material";
 
 export const seasonThumbnails: Record<string, string | undefined> = {
   1: 'https://media.themoviedb.org/t/p/w260_and_h390_bestv2/v0zwS50Hb0DZX6TztRLFuq5LVa3.jpg',
@@ -22,6 +23,8 @@ export default function Home() {
       <p>Watch and enjoy the magic that Stewart Cheifet and his team created.</p>
 
       <SeasonList/>
+
+      <Typography variant="h6" style={{ textAlign: 'center', marginTop: '16px' }}>More seasons being added soon...</Typography>
     </div>
   )
 }
@@ -47,7 +50,7 @@ function SeasonList() {
 
 
   return (
-    <Cards>
+    <Cards small>
       {Object.entries(episodesBySeason).map(([season, episodes]) => (
         <Card key={season} linkTo={`/season/${season}`} imageLeftOnMobile>
           <CardMedia
