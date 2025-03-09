@@ -4,7 +4,6 @@ import * as episodesRoutes from './api/episodes'
 import * as watchedEpisodesRoutes from './api/watchedEpisodes'
 import * as loginRoutes from './api/login'
 
-
 const server = serve({
   routes: {
     '/*': index,
@@ -12,7 +11,7 @@ const server = serve({
     '/api/watchedEpisodes': watchedEpisodesRoutes,
     '/api/login': loginRoutes
   },
-  development: true,
+  development: true
 })
 
 console.log(`🚀 Server running at ${server.url}`)

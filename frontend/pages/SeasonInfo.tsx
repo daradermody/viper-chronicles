@@ -1,7 +1,8 @@
 import { Card, CardContent, CardMedia, Cards } from '../cards/Cards'
 import { useMemo } from 'react'
-import { useParams } from 'react-router-dom'
-import { Checkbox, FormControlLabel, Typography } from '@mui/material'
+import {Link, useParams } from 'react-router-dom'
+import {Checkbox, FormControlLabel, IconButton, Typography} from '@mui/material'
+import {ArrowBack} from "@mui/icons-material";
 
 import Header from '../Header'
 import { useData } from '../data/DataProvider'
@@ -13,6 +14,12 @@ export default function SeasonInfo() {
   return (
     <div>
       <Header/>
+      <div style={{ display: 'flex', gap: '4px' }}>
+        <Link to="/">
+          <IconButton aria-label="Back to season list"><ArrowBack/></IconButton>
+        </Link>
+        <Typography variant="h4" style={{ marginBottom: '16px' }}>Season {season}</Typography>
+      </div>
       <EpisodeList season={Number(season)}/>
     </div>
   )

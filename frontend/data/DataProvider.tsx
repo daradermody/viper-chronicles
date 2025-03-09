@@ -2,6 +2,7 @@ import { createContext, ReactNode, useContext } from 'react'
 import { Episode } from '../../types'
 import { useEpisodes } from './UseEpisodes'
 import { useWatchedEpisodes } from './UseWatchedEpisodes'
+import {CircularProgress} from "@mui/material";
 
 const DataProviderContext = createContext<Data | undefined>(undefined)
 
@@ -20,7 +21,11 @@ export function DataProvider({ children }: { children: ReactNode }) {
   }
 
   if (!watchedEpisodes || !episodes) {
-    return null
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 'calc(100vh - 40px)' }}>
+        <CircularProgress size={150} />
+      </div>
+    )
   }
 
   return (

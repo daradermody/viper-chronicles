@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "bun --hot devServer.ts",
-    "build": "bun build ./frontend/index.html --outdir=dist --public-path='/' --sourcemap --target=browser --minify --define:process.env.NODE_ENV='\"production\"' --env 'PUBLIC_*'"
+    "build": "bun build ./frontend/index.html --outdir=dist --public-path='/' --sourcemap --target=browser --minify --define:process.env.NODE_ENV='\"production\"'"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",

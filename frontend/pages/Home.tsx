@@ -23,8 +23,6 @@ export default function Home() {
       <p>Watch and enjoy the magic that Stewart Cheifet and his team created.</p>
 
       <SeasonList/>
-
-      <Typography variant="h6" style={{ textAlign: 'center', marginTop: '16px' }}>More seasons being added soon...</Typography>
     </div>
   )
 }

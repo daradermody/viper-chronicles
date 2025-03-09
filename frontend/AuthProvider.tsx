@@ -15,7 +15,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } else {
       setIsLoading(false)
     }
-  })
+  }, [])
 
   async function handleLogin(password: string) {
     const response = await fetch('/api/login', { method: 'POST', body: JSON.stringify({ password }) })
