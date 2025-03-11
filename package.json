@@ -14,16 +14,19 @@
     "@mui/icons-material": "^6.4.7",
     "@mui/material": "^6.4.7",
     "clsx": "^2.1.1",
+    "keyboard-css": "^1.2.4",
     "react": "^19",
     "react-dom": "^19",
     "react-router-dom": "^7.2.0",
-    "vercel": "^41.3.2"
+    "vercel": "^41.3.2",
+    "youtube-player": "^5.6.0"
   },
   "devDependencies": {
     "@types/bun": "latest",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@types/redis": "^4.0.11"
+    "@types/redis": "^4.0.11",
+    "@types/youtube-player": "^5.5.11"
   },
   "packageManager": "yarn@1.22.19+sha1.4ba7fc5c6e704fce2066ecbfb0b0d8976fe62447"
 }

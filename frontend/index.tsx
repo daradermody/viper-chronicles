@@ -2,6 +2,7 @@ import { createRoot } from 'react-dom/client'
 import { StrictMode } from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { StyledEngineProvider } from '@mui/material'
+import 'keyboard-css'
 
 import './index.css'
 import Home from './pages/Home'

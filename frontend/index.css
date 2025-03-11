@@ -27,6 +27,10 @@ body {
   grid-template-columns: 1fr;
 }
 
+.hide-sm {
+  display: none;
+}
+
 @media (min-width: 800px) {
   .card-grid {
     grid-template-columns: repeat(auto-fit, minmax(530px, 1fr))
@@ -34,7 +38,7 @@ body {
   .card-grid.small {
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr))
   }
+  .hide-sm {
+    display: unset;
+  }
 }
-
-
-
