@@ -1,7 +1,8 @@
-import { ReactNode } from 'react'
+import { CSSProperties, ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import clsx from 'clsx'
 import { Typography } from '@mui/material'
+import { Episode } from '../../types'
 
 import './card.css'
 
@@ -18,13 +19,14 @@ interface CardProps {
   disabled?: boolean;
   children: ReactNode[]
   imageLeftOnMobile?: boolean;
+  style?: CSSProperties;
 }
 
-export function Card({ children, linkTo, disabled, imageLeftOnMobile }: CardProps) {
+export function Card({ children, linkTo, disabled, imageLeftOnMobile, style }: CardProps) {
   if (linkTo) {
     return (
       <Link to={linkTo} className="card-link">
-        <div className={clsx('card', { disabled })}>{children}</div>
+        <div className={clsx('card', { disabled })} style={style}>{children}</div>
       </Link>
     )
   } else {
@@ -38,16 +40,19 @@ interface CardMediaProps {
   height?: string;
   alt?: string;
   orientation?: 'landscape' | 'portrait';
+  className?: string;
+  style?: CSSProperties;
 }
 
-export function CardMedia({ width, height, image, alt, orientation }: CardMediaProps) {
+export function CardMedia({ width, height, image, alt, orientation, className, style }: CardMediaProps) {
   return (
     <img
-      className={clsx('card-media', { portrait: orientation === 'portrait' })}
+      className={clsx('card-media', { portrait: orientation === 'portrait' }, className)}
       src={image}
       alt={alt}
       height={height}
       width={width}
+      style={style}
     />
   )
 }
@@ -87,4 +92,14 @@ export function CardContent({ title, subtitle, description, actions }: CardConte
       ))}
     </div>
   )
+}
+
+export function getThumbnail(episode: Episode): string {
+  if (episode.thumbnail) {
+    return episode.thumbnail
+  } else if (episode.youtubeId) {
+    return `https://i.ytimg.com/vi/${episode.youtubeId}/hqdefault.jpg`
+  } else {
+    return 'https://pbs.twimg.com/profile_images/80829742/scheadshot_400x400.jpg'
+  }
 }

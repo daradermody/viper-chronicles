@@ -13,21 +13,23 @@ import { AuthProvider } from './AuthProvider'
 
 const elem = document.getElementById('root')!
 const app = (
-  // <StrictMode>
+  <StrictMode>
     <StyledEngineProvider injectFirst>
       <AuthProvider>
         <DataProvider>
           <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Home/>}/>
-              <Route path="/season/:season" element={<SeasonInfo/>}/>
-              <Route path="/season/:season/episode/:episode" element={<EpisodeInfo/>}/>
-            </Routes>
+            <div style={{ maxWidth: '1700px', margin: '0 auto' }}>
+              <Routes>
+                <Route path="/" element={<Home/>}/>
+                <Route path="/season/:season" element={<SeasonInfo/>}/>
+                <Route path="/season/:season/episode/:episode" element={<EpisodeInfo/>}/>
+              </Routes>
+            </div>
           </BrowserRouter>
         </DataProvider>
       </AuthProvider>
     </StyledEngineProvider>
-  // </StrictMode>
+  </StrictMode>
 )
 
 if ((import.meta as any).hot) {

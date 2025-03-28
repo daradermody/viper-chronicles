@@ -1,4 +1,4 @@
-import { Card, CardContent, CardMedia, Cards } from '../cards/Cards'
+import { Card, CardContent, CardMedia, Cards, getThumbnail } from '../cards/Cards'
 import { useMemo } from 'react'
 import {Link, useParams } from 'react-router-dom'
 import {Checkbox, FormControlLabel, IconButton, Typography} from '@mui/material'
@@ -67,12 +67,3 @@ function EpisodeList({ season }: { season: number }) {
   )
 }
 
-function getThumbnail(episode: Episode): string {
-  if (episode.thumbnail) {
-    return episode.thumbnail
-  } else if (episode.youtubeId) {
-    return `https://i.ytimg.com/vi/${episode.youtubeId}/hqdefault.jpg`
-  } else {
-    return 'https://pbs.twimg.com/profile_images/80829742/scheadshot_400x400.jpg'
-  }
-}

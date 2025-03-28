@@ -74,7 +74,7 @@ function YouTubeKeyControl({ player }: { player: YouTubePlayer }) {
   }, [player, numberToTime])
 
   return (
-    <div className="hide-sm">
+    <div className="hide-sm-down">
       <IconButton onClick={() => setShowYtControls(prev => !prev)}>
         <Keyboard/>
       </IconButton>
@@ -115,8 +115,10 @@ function toTimestamp(totalSeconds: number): string {
   const hours = Math.floor(totalSeconds / 3600)
   const remaining = totalSeconds % 3600
   const minutes = Math.floor(remaining / 60)
-  const seconds = Math.floor(remaining % 60)
-  const minsSecs = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
+  const remainingSeconds = remaining % 60
+  const seconds = Math.floor(remainingSeconds)
+  const milliseconds = Math.floor(remainingSeconds % 1 * 1000)
+  const minsSecs = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}.${milliseconds.toString().padEnd(3, '0')}`
   if (hours) {
     return `${hours.toString().padStart(2, '0')}:${minsSecs}`
   } else {
