@@ -1,8 +1,6 @@
-
-
 import { useCallback, useEffect, useState } from 'react'
 
-export function useWatchedEpisodes() {
+export function useWatchedEpisodes(show: 'computerChronicles' | 'netCafe') {
   const [watchedEpisodes, setWatchedEpisodes] = useState<string[]>()
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<Error>()
@@ -13,7 +11,7 @@ export function useWatchedEpisodes() {
 
   const fetchWatchedEpisodes = useCallback(async () => {
     try {
-      const res = await fetch('/api/watchedEpisodes')
+      const res = await fetch(`/api/${show}/watchedEpisodes`)
       setWatchedEpisodes(await res.json())
     } catch (e) {
       setError(e as Error)
@@ -25,14 +23,14 @@ export function useWatchedEpisodes() {
   async function setWatched(id: string, watched: boolean) {
     try {
       setWatchedEpisodes(prevIds => watched ? [...(prevIds || []), id] : (prevIds || []).filter(prevId => prevId !== id))
-      await fetch(`/api/watchedEpisodes`, {
+      await fetch(`/api/${show}/watchedEpisodes`, {
         method: 'POST',
         body: JSON.stringify({ id, watched }),
         headers: { 'Content-Type': 'application/json' },
       })
-      await fetchWatchedEpisodes()
     } catch (error) {
       setError(error as Error)
+      await fetchWatchedEpisodes()
     } finally {
       setLoading(false)
     }

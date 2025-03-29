@@ -7,20 +7,29 @@ import {CircularProgress} from "@mui/material";
 const DataProviderContext = createContext<Data | undefined>(undefined)
 
 interface Data {
-  episodes: Episode[];
-  watchedEpisodes: string[];
-  setWatched(episodeId: string, watched: boolean): void;
+  computerChronicles: {
+    episodes: Episode[];
+    watched: string[];
+    setWatched(episodeId: string, watched: boolean): void;
+  };
+  netCafe: {
+    episodes: Episode[];
+    watched: string[];
+    setWatched(episodeId: string, watched: boolean): void;
+  };
 }
 
 export function DataProvider({ children }: { children: ReactNode }) {
-  const { episodes, error: episodesError } = useEpisodes()
-  const { watchedEpisodes, error: watchedError, setWatched } = useWatchedEpisodes()
+  const { episodes: computerChroniclesEpisodes, error: computerChroniclesEpisodesError } = useEpisodes('computerChronicles')
+  const { episodes: netCafeEpisodes, error: netCafeEpisodesError } = useEpisodes('netCafe')
+  const { watchedEpisodes: computerChroniclesWatchedEpisodes, error: computerChroniclesWatchedError, setWatched: computerChroniclesSetWatched } = useWatchedEpisodes('computerChronicles')
+  const { watchedEpisodes: netCafeWatchedEpisodes, error: netCafeEatchedError, setWatched: netCafeSetWatched } = useWatchedEpisodes('netCafe')
 
-  if (episodesError || watchedError) {
+  if (computerChroniclesEpisodesError || netCafeEpisodesError || computerChroniclesWatchedError || netCafeEatchedError) {
     return <div>Something went wrong fetching data :(</div>
   }
 
-  if (!watchedEpisodes || !episodes) {
+  if (!computerChroniclesEpisodes || !netCafeEpisodes || !computerChroniclesWatchedEpisodes || !netCafeWatchedEpisodes) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 'calc(100vh - 40px)' }}>
         <CircularProgress size={150} />
@@ -29,7 +38,12 @@ export function DataProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <DataProviderContext value={{ episodes, watchedEpisodes, setWatched }}>
+    <DataProviderContext
+      value={{
+        computerChronicles: { episodes: computerChroniclesEpisodes, watched: computerChroniclesWatchedEpisodes, setWatched: computerChroniclesSetWatched },
+        netCafe: { episodes: netCafeEpisodes, watched: netCafeWatchedEpisodes, setWatched: netCafeSetWatched }
+      }}
+    >
       {children}
     </DataProviderContext>
   )

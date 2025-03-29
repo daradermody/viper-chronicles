@@ -1,14 +1,18 @@
 import { serve } from 'bun'
 import index from './frontend/index.html'
-import * as episodesRoutes from './api/episodes'
-import * as watchedEpisodesRoutes from './api/watchedEpisodes'
+import * as computerChroniclesEpisodesRoutes from './api/computerChronicles/episodes'
+import * as computerChroniclesWatchedEpisodesRoutes from './api/computerChronicles/watchedEpisodes'
+import * as netCafeEpisodesRoutes from './api/netCafe/episodes'
+import * as netCafeWatchedEpisodesRoutes from './api/netCafe/watchedEpisodes'
 import * as loginRoutes from './api/login'
 
 const server = serve({
   routes: {
     '/*': index,
-    '/api/episodes': episodesRoutes,
-    '/api/watchedEpisodes': watchedEpisodesRoutes,
+    '/api/computerChronicles/episodes': computerChroniclesEpisodesRoutes,
+    '/api/computerChronicles/watchedEpisodes': computerChroniclesWatchedEpisodesRoutes,
+    '/api/netCafe/episodes': netCafeEpisodesRoutes,
+    '/api/netCafe/watchedEpisodes': netCafeWatchedEpisodesRoutes,
     '/api/login': loginRoutes
   },
   development: true

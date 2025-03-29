@@ -19,7 +19,7 @@ export function VideoPlayer({ episode }: { episode: Episode }) {
 
   if (episode.youtubeId) {
     return (
-      <div style={{ width: '100%', display: 'flex', justifyContent: 'center', gap: '8px' }}>
+      <div style={{ width: '100%', display: 'flex', gap: '8px' }}>
         <div id="yt-player" style={{ maxWidth: '100%', width: '800px', height: '600px' }}/>
         {player && <YouTubeKeyControl player={player}/>}
       </div>

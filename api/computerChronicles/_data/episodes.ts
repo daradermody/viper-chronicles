@@ -1,7 +1,7 @@
-import { Episode } from '../../types.js'
+import { Episode } from '../../../types.js'
 
 // Use this as a reference: https://compchronicles.blogspot.com/
-export const episodes: Episode[] = [
+export const computerChroniclesEpisodes: Episode[] = [
   {"id":"X-QKNSsUE_xpX3ijI8QBI","season":1,"episode":1,"title":"Mainframes to Minis to Micros","releaseDate":"1984-02-05","archiveOrgId":"MainFram1984","youtubeId":"wpXnqBfgvPM","description":"This was the very first episode of the Computer Chronicles, originally broadcast in September 1983, covering the history and ancestry of today's PC.","thumbnail":"https://media.themoviedb.org/t/p/w454_and_h254_bestv2/hZ1Ks7N8Ue6tylm6nLLgnVV5Cdi.jpg"},
   {"id":"7dmik53Mc5RjiGxtPQsy5","season":1,"episode":2,"title":"Integrated Software","releaseDate":"1984-02-12","archiveOrgId":"Integrat1984","description":"The new breed of integrated software suites and the visual interface.","thumbnail":"https://media.themoviedb.org/t/p/w454_and_h254_bestv2/jwXSyPNWdCbmA8SHK7Iy7RUiKxP.jpg","youtubeId":"mO-63eqhl6o"},
   {"id":"7OrUybg1nOW_YJ9ymWANg","season":1,"episode":3,"title":"Computer Music","releaseDate":"1984-02-19","archiveOrgId":"Computer1984","description":"The computer as a creative tool used to make, display and store music.","thumbnail":"https://media.themoviedb.org/t/p/w454_and_h254_bestv2/2acq4prRoLxSFksCl0LDrV70LBa.jpg","youtubeId":"1LEn94TF1tg"},

@@ -58,7 +58,7 @@ export function CardMedia({ width, height, image, alt, orientation, className, s
 }
 
 interface CardContentProps {
-  title?: string;
+  title?: string | ReactNode;
   subtitle?: string;
   description?: string;
   actions?: ReactNode[];
@@ -67,11 +67,12 @@ interface CardContentProps {
 export function CardContent({ title, subtitle, description, actions }: CardContentProps) {
   return (
     <div className="card-content">
-      {title && (
+      {title && typeof title === 'string' && (
         <Typography variant="body1">
           <b>{title}</b>
         </Typography>
       )}
+      {title && typeof title !== 'string' && title}
 
       {subtitle && (
         <Typography variant="caption" sx={{ marginBottom: '4px' }}>

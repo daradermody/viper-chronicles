@@ -20,13 +20,17 @@ export default function Header() {
   const [showSearch, setShowSearch] = useState(false)
   return (
     <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-      <Typography variant="h2" fontSize="3rem">
-        <Link to="/" style={{ cursor: 'pointer', textDecoration: 'none', color: 'inherit' }}>
-          Viper Chronicles
+      <h1 style={{ margin: 0, lineHeight: '1.8rem' }}>
+        <Link to="/" style={{ cursor: 'pointer', textDecoration: 'none', color: 'inherit', fontFamily: 'silkscreen', fontSize: '40px' }}>
+          <div>Viper</div>
+          <div style={{ marginLeft: '37px' }}>Chronicles</div>
         </Link>
-      </Typography>
+      </h1>
       <div className="hide-xs-down header-info">
-        <EpisodeProgress/>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+          <EpisodeProgress show="computerChronicles"/>
+          <EpisodeProgress show="netCafe"/>
+        </div>
         <Button
           className="hide-md-down"
           variant="outlined"
@@ -48,14 +52,15 @@ export default function Header() {
   )
 }
 
-function EpisodeProgress() {
-  const {episodes, watchedEpisodes} = useData()
+function EpisodeProgress({ show }: { show: 'computerChronicles' | 'netCafe' }) {
+  const episodeData = useData()
+  const { episodes, watched } = episodeData[show]
 
-  const percent = Math.floor(watchedEpisodes.length / episodes.length * 100)
+  const percent = Math.floor(watched.length / episodes.length * 100)
   return (
     <div className="hide-sm-down" style={{ width: '300px', position: 'relative' }}>
       <ThickLinearProgress variant="determinate" value={percent}/>
-      <span style={{ position: 'absolute', top: 0, left: 0, right: 0, textAlign: 'center' }}>{watchedEpisodes.length} / {episodes.length} ({percent}%)</span>
+      <span style={{ position: 'absolute', top: 0, left: 0, right: 0, textAlign: 'center' }}>{watched.length} / {episodes.length} ({percent}%)</span>
     </div>
   )
 }
@@ -72,7 +77,11 @@ const ThickLinearProgress = styled(LinearProgress)(({ theme }) => ({
 
 function SearchModal({ open, onClose }: { open: boolean, onClose: () => void }) {
   const [query, setQuery] = useState('')
-  const {episodes} = useData()
+  const episodeData = useData()
+  const episodes = [
+    ...episodeData.computerChronicles.episodes.map(episode => ({ ...episode, show: 'computerChronicles' })),
+    ...episodeData.netCafe.episodes.map(episode => ({ ...episode, show: 'netCafe' }))
+  ]
 
   const searchedEpisodes = useMemo(() => searchEpisodes(query, episodes), [episodes, query])
 
@@ -99,11 +108,11 @@ function SearchModal({ open, onClose }: { open: boolean, onClose: () => void }) 
       </DialogTitle>
       <DialogContent sx={{ p: 0, maxHeight: 'calc(88vh - 61px)' }} onClick={onClose}>
         {searchedEpisodes?.map(episode => (
-          <Card key={episode.id} linkTo={`/season/${episode.season}/episode/${episode.episode}`} style={{ height: '120px' }}>
-            <CardMedia className="hide-sm-down" image={getThumbnail(episode)} alt={`Episode ${episode.episode}`} style={{ width: '162px' }}/>
+          <Card key={episode.id} linkTo={`/${episode.show}/season/${episode.season}/episode/${episode.episode}`} style={{ height: '120px' }}>
+            <CardMedia className="hide-sm-down" image={getThumbnail(episode)} alt={`Episode ${episode.episode}`} style={{ width: '162px', flexShrink: 0 }}/>
             <CardContent
               title={`S${episode.season.toString().padStart(2, '0')}E${episode.episode.toString().padStart(2, '0')}. ${episode.title}`}
-              subtitle={episode.releaseDate}
+              subtitle={episode.show === 'computerChronicles' ? 'Computer Chronicles' : 'Net Cafe'}
               description={episode.description || '<No description>'}
             />
           </Card>
@@ -113,7 +122,7 @@ function SearchModal({ open, onClose }: { open: boolean, onClose: () => void }) 
   )
 }
 
-function searchEpisodes(query: string, episodes?: Episode[]): undefined | (Episode & { _score: number })[] {
+function searchEpisodes<T extends Episode>(query: string, episodes?: T[]): undefined | (T & { _score: number })[] {
   if (!episodes) return undefined
   if (!query) return undefined
 

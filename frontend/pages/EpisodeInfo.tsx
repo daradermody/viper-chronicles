@@ -5,35 +5,42 @@ import {ArrowBack} from '@mui/icons-material'
 
 import {Episode} from '../../types'
 import Header from '../Header'
-import {useData} from '../data/DataProvider'
+import { useData } from '../data/DataProvider'
 import {VideoPlayer} from '../VideoPlayer'
 
 export default function EpisodeInfo() {
-  const { season, episode: episodeNumber } = useParams<{ season: string; episode: string }>()
-  const { episodes, watchedEpisodes, setWatched } = useData()
+  const { show, season, episode: episodeNumber } = useParams<{ show: 'computerChronicles' | 'netCafe'; season: string; episode: string }>()
+  const episodeData = useData()
+  const { episodes, watched, setWatched } = episodeData[show!]
 
   const episode = useMemo(
-    () => episodes.find(ep => ep.season === Number(season) && ep.episode === Number(episodeNumber)),
-    [season, episodeNumber],
+    () => episodes?.find(ep => ep.season === Number(season) && ep.episode === Number(episodeNumber)),
+    [episodes, season, episodeNumber],
   )!
+
+  if(!episode) return null;
 
   return (
     <div>
       <Header/>
 
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <div style={{ display: 'flex', flexDirection: 'column' }}>
         <div style={{ display: 'flex', gap: '4px' }}>
-          <Link to={`/season/${season}`}>
+          <Link to={`/${show}/season/${season}`}>
             <IconButton aria-label="Back to episode list list"><ArrowBack/></IconButton>
           </Link>
-          <Typography variant="h4">{getEpisodeShortCode(episode)} {episode.title}</Typography>
+
+          <Typography variant="h4" style={{ marginBottom: '16px', display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+            <span className="hide-sm-down">{show === 'computerChronicles' ? 'Computer Chronicles' : 'Net Cafe'} / Season {season} /</span>
+            <span>E{episodeNumber?.toString().padStart(2, '0')} {episode.title}</span>
+          </Typography>
         </div>
-        <Typography variant="body1" sx={{ maxWidth: '1000px', margin: '10px 0', textAlign: 'center' }}>
+        <Typography variant="body1" sx={{ maxWidth: '1000px', margin: '10px 0' }}>
           {episode.description}
         </Typography>
 
         <FormControlLabel
-          control={<Checkbox checked={watchedEpisodes?.includes(episode.id)} onChange={e => setWatched(episode.id, e.target.checked)}/>}
+          control={<Checkbox checked={watched?.includes(episode.id)} onChange={e => setWatched(episode.id, e.target.checked)}/>}
           label={<Typography variant="caption" sx={{ marginTop: '4px' }}>Watched</Typography>}
         />
 

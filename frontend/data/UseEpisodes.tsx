@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react'
 import { Episode } from '../../types'
 
-export function useEpisodes() {
+export function useEpisodes(show: 'computerChronicles' | 'netCafe') {
   const [episodes, setEpisodes] = useState<Episode[]>()
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<Error>()
 
   useEffect(() => {
-    fetch('/api/episodes')
+    fetch(`/api/${show}/episodes`)
       .then(async response => setEpisodes(await response.json()))
       .catch(e => setError(e))
       .finally(() => setLoading(false))

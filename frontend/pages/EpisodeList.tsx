@@ -6,29 +6,33 @@ import {ArrowBack} from "@mui/icons-material";
 
 import Header from '../Header'
 import { useData } from '../data/DataProvider'
-import {Episode} from "../../types";
 
-export default function SeasonInfo() {
-  const { season } = useParams<{ season: string }>()
+export default function EpisodeList() {
+  const { show, season } = useParams<{ show: 'computerChronicles' | 'netCafe'; season: string }>()
 
   return (
     <div>
       <Header/>
       <div style={{ display: 'flex', gap: '4px' }}>
-        <Link to="/">
+        <Link to={`/${show}`}>
           <IconButton aria-label="Back to season list"><ArrowBack/></IconButton>
         </Link>
-        <Typography variant="h4" style={{ marginBottom: '16px' }}>Season {season}</Typography>
+        <Typography variant="h4" style={{ marginBottom: '16px', display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+          <span className="hide-sm-down">{show === 'computerChronicles' ? 'Computer Chronicles' : 'Net Cafe'} /</span>
+          <span>Season {season}</span>
+        </Typography>
       </div>
-      <EpisodeList season={Number(season)}/>
+      <EpisodeList2 season={Number(season)}/>
     </div>
   )
 }
 
-function EpisodeList({ season }: { season: number }) {
-  const { episodes, watchedEpisodes, setWatched } = useData()
+function EpisodeList2({ season }: { season: number }) {
+  const episodeData = useData()
+  const show = useParams<{ show: string }>().show as 'computerChronicles' | 'netCafe'
+  const { episodes, watched, setWatched } = episodeData[show]
 
-  const episodesInSeason = useMemo(() => episodes.filter(episode => episode.season === season), [episodes, season])
+  const episodesInSeason = useMemo(() => (episodes || []).filter(episode => episode.season === season), [episodes, season])
 
   return (
     <Cards>
@@ -36,8 +40,8 @@ function EpisodeList({ season }: { season: number }) {
 
         <Card
           key={episode.episode}
-          linkTo={`/season/${episode.season}/episode/${episode.episode}`}
-          disabled={watchedEpisodes?.includes(episode.id)}
+          linkTo={`/${show}/season/${episode.season}/episode/${episode.episode}`}
+          disabled={watched?.includes(episode.id)}
         >
           <CardMedia
             image={getThumbnail(episode)}
@@ -53,7 +57,7 @@ function EpisodeList({ season }: { season: number }) {
                 control={(
                   <Checkbox
                     size="small"
-                    checked={watchedEpisodes?.includes(episode.id)}
+                    checked={watched?.includes(episode.id)}
                     onChange={e => setWatched(episode.id, e.target.checked)}
                   />
                 )}

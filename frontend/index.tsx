@@ -6,8 +6,10 @@ import 'keyboard-css'
 
 import './index.css'
 import Home from './pages/Home'
-import SeasonInfo from './pages/SeasonInfo'
+import EpisodeList from './pages/EpisodeList'
 import EpisodeInfo from './pages/EpisodeInfo'
+import ComputerChroniclesSeasonList from './pages/ComputerChroniclesSeasonList'
+import NetCafeSeasonList from './pages/NetCafeSeasonList'
 import { DataProvider } from './data/DataProvider'
 import { AuthProvider } from './AuthProvider'
 
@@ -21,8 +23,10 @@ const app = (
             <div style={{ maxWidth: '1700px', margin: '0 auto' }}>
               <Routes>
                 <Route path="/" element={<Home/>}/>
-                <Route path="/season/:season" element={<SeasonInfo/>}/>
-                <Route path="/season/:season/episode/:episode" element={<EpisodeInfo/>}/>
+                <Route path="/computerChronicles" element={<ComputerChroniclesSeasonList/>}/>
+                <Route path="/netCafe" element={<NetCafeSeasonList/>}/>
+                <Route path="/:show/season/:season" element={<EpisodeList/>}/>
+                <Route path="/:show/season/:season/episode/:episode" element={<EpisodeInfo/>}/>
               </Routes>
             </div>
           </BrowserRouter>

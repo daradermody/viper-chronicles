@@ -1,20 +1,8 @@
-import { Card, CardContent, CardMedia, Cards } from '../cards/Cards'
-import { useEffect, useMemo, useState } from 'react'
-
 import Header from '../Header'
-import { useData } from '../data/DataProvider'
-import { Episode } from '../../types'
-import {Typography} from "@mui/material";
-
-export const seasonThumbnails: Record<string, string | undefined> = {
-  1: 'https://media.themoviedb.org/t/p/w260_and_h390_bestv2/v0zwS50Hb0DZX6TztRLFuq5LVa3.jpg',
-  2: 'https://media.themoviedb.org/t/p/w260_and_h390_bestv2/2FBjiSo2nVLkttjzUooHPrhrHOX.jpg',
-  3: 'https://media.themoviedb.org/t/p/w260_and_h390_bestv2/6P9oIwcInbNB9nB8mWV2PAF3e87.jpg',
-  4: 'https://media.themoviedb.org/t/p/w260_and_h390_bestv2/fqsHTnLY0VXbPVkaXbFIFQAWPqz.jpg',
-  5: 'https://media.themoviedb.org/t/p/w260_and_h390_bestv2/zp8Y1UU9njtPQx0bEOJW5PYlueA.jpg',
-  6: 'https://media.themoviedb.org/t/p/w260_and_h390_bestv2/lUAMWCTNlDxwnV8eiNqwgxoZlk0.jpg',
-  7: undefined,
-}
+import { Card, CardContent, CardMedia } from '../cards/Cards'
+import { Chip } from '@mui/material'
+// @ts-ignore
+import netCafeLogo from '../netCafe.jpg'
 
 export default function Home() {
   return (
@@ -22,60 +10,28 @@ export default function Home() {
       <Header/>
       <p>Watch and enjoy the magic that Stewart Cheifet and his team created.</p>
 
-      <SeasonList/>
-    </div>
-  )
-}
-
-function SeasonList() {
-  const { watchedEpisodes, episodes } = useData()
-
-  const episodesBySeason = useMemo(
-    () => Object.groupBy(episodes || [], episode => episode.season),
-    [episodes],
-  )
-
-  const watchedEpisodesBySeason = useMemo(() => {
-    if (!watchedEpisodes) {
-      return {}
-    }
-    const watchedEpisodesBySeason: Record<string, Episode[]> = {}
-    for (const [season, episodes] of Object.entries(episodesBySeason)) {
-      watchedEpisodesBySeason[season] = episodes?.filter(episode => watchedEpisodes.includes(episode.id)) || []
-    }
-    return watchedEpisodesBySeason
-  }, [watchedEpisodes, episodesBySeason])
-
-
-  return (
-    <Cards small>
-      {Object.entries(episodesBySeason).map(([season, episodes]) => (
-        <Card key={season} linkTo={`/season/${season}`} imageLeftOnMobile>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        <Card linkTo="/computerChronicles">
           <CardMedia
-            image={seasonThumbnails[season] || 'https://www.themoviedb.org/t/p/w600_and_h900_bestv2/kuLf05Qw4Ki5brXfrUaK1iTowr9.jpg'}
-            alt={`Season ${season}`}
-            orientation="portrait"
+            style={{ minHeight: '162px' }}
+            image="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhpHOVabggF_Fg7IYqB9KqA-xBpZxgoyI5ZmNivsKr-S9C9aAKnfquHU5Y0cK9ai8vpMvj8ugMoCZ9FFF7_FPl3mQ5wkjn4ZRYE12nBBX235dLN-W1i1C8KJw_56z3ZDwnHDNrf/s1600/chronicles.jpg"
+            alt="Computer Chronicles"
           />
           <CardContent
-            title={`Season ${season} (${episodes?.[0]?.releaseDate.split('-')[0]})`}
-            subtitle={`${episodes?.length} episodes ${watchedEpisodesBySeason[season] ? `(${watchedEpisodesBySeason[season].length} watched)` : ''}`}
+            title="Computer Chronicles"
+            subtitle="1984–2002"
+            description="Computer Chronicles is an American half-hour television series that was broadcast on PBS public television from 1984 to 2002."
           />
         </Card>
-      ))}
-    </Cards>
+        <Card linkTo="/netCafe">
+          <CardMedia image={netCafeLogo} alt="Computer Chronicles"/>
+          <CardContent
+            title={<span><b>Net Cafe</b> <Chip color="primary" label="Beta" size="small" sx={{ fontSize: '10px', height: '19px' }}/></span>}
+            subtitle="1996–2002"
+            description="A spin-off of Computer Chronicles, Net Cafe (or Cheifet's Net Cafe or The Internet Cafe) was a US television series documenting the internet boom of the late 1990s"
+          />
+        </Card>
+      </div>
+    </div>
   )
-}
-
-function useEpisodes() {
-  const [episodes, setEpisodes] = useState<Episode[]>()
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<Error>()
-
-  useEffect(() => {
-    fetch('/api/episodes')
-      .then(async response => setEpisodes(await response.json()))
-      .catch(setError)
-  }, [setEpisodes])
-
-  return { episodes, loading, error }
 }
