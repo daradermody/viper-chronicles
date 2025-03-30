@@ -6,48 +6,94 @@ import {
   IconButton,
   LinearProgress,
   linearProgressClasses,
+  Menu,
+  MenuItem, MenuList,
   styled,
-  Typography,
 } from '@mui/material'
 import { Link } from 'react-router-dom'
-import { Search } from '@mui/icons-material'
+import { Search, Menu as MenuIcon } from '@mui/icons-material'
 import { useMemo, useState } from 'react'
 import { Episode } from '../types'
 import { useData } from './data/DataProvider'
 import { Card, CardContent, CardMedia, getThumbnail } from './cards/Cards'
+import { useAuth } from './AuthProvider'
 
-export default function Header() {
+export function Header() {
   const [showSearch, setShowSearch] = useState(false)
+
   return (
-    <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-      <h1 style={{ margin: 0, lineHeight: '1.8rem' }}>
-        <Link to="/" style={{ cursor: 'pointer', textDecoration: 'none', color: 'inherit', fontFamily: 'silkscreen', fontSize: '40px' }}>
-          <div>Viper</div>
-          <div style={{ marginLeft: '37px' }}>Chronicles</div>
-        </Link>
-      </h1>
-      <div className="hide-xs-down header-info">
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-          <EpisodeProgress show="computerChronicles"/>
-          <EpisodeProgress show="netCafe"/>
-        </div>
-        <Button
-          className="hide-md-down"
-          variant="outlined"
-          startIcon={<Search/>}
-          color="inherit"
-          aria-label="search"
-          onClick={() => setShowSearch(true)}
-          style={{ flexShrink: 0, color: 'gray', borderColor: '1px solid #000000de' }}
-          disableRipple
-        >
-          Search episodes...
-        </Button>
-        <IconButton className="hide-md-up" aria-label="search" onClick={() => setShowSearch(true)}>
-          <Search/>
-        </IconButton>
+    <div style={{ backgroundColor: '#ebeaea', width: '100%' }}>
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        maxWidth: '1700px',
+        width: 'calc(100vw - 40px)',
+        margin: '20px auto',
+        gap: '40px',
+      }}>
+        <h1 className="logo" style={{  }}>
+          <Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
+            <div>Viper</div>
+            <div style={{ marginLeft: '37px' }}>Chronicles</div>
+          </Link>
+        </h1>
+
+        <HeaderActions onSearchClick={() => setShowSearch(true)} />
+        <MenuButton onSearchClick={() => setShowSearch(true)} />
+        <SearchModal open={showSearch} onClose={() => setShowSearch(false)}/>
       </div>
-      <SearchModal open={showSearch} onClose={() => setShowSearch(false)}/>
+
+    </div>
+  )
+}
+
+function HeaderActions({onSearchClick}: { onSearchClick: () => void }) {
+  const {isLoggedIn, LoginButton, LogoutButton} = useAuth()
+
+  return (
+    <div className="hide-sm-down header-info">
+      <div className="hide-sm-down" style={{ display: 'flex', flexDirection: 'column', gap: '4px', maxWidth: '300px', flexGrow: 1 }}>
+        <EpisodeProgress show="computerChronicles"/>
+        <EpisodeProgress show="netCafe"/>
+      </div>
+      <Button
+        className="hide-md-down"
+        variant="outlined"
+        startIcon={<Search/>}
+        color="inherit"
+        aria-label="search"
+        onClick={onSearchClick}
+        style={{ flexShrink: 0, color: 'gray', borderColor: '1px solid #000000de' }}
+        disableRipple
+      >
+        Search episodes...
+      </Button>
+      <IconButton className="hide-md-up" aria-label="search" onClick={onSearchClick}>
+        <Search/>
+      </IconButton>
+      {isLoggedIn ? <LogoutButton/> : <LoginButton/>}
+    </div>
+  )
+}
+
+function MenuButton({ onSearchClick }: { onSearchClick: () => void }) {
+  const {isLoggedIn, LoginButton, LogoutButton} = useAuth()
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
+  return (
+    <div className="hide-sm-up">
+      <IconButton onClick={e => setAnchorEl(e.currentTarget)}>
+        <MenuIcon/>
+      </IconButton>
+      <Menu anchorEl={anchorEl} open={!!anchorEl} onClose={() => setAnchorEl(null)}>
+        <MenuItem onClick={() => setAnchorEl(null)}>
+          <Button variant="text" color="inherit" onClick={onSearchClick}>Search</Button>
+        </MenuItem>
+        <MenuItem>
+          {isLoggedIn ? <LogoutButton/> : <LoginButton/>}
+        </MenuItem>
+      </Menu>
     </div>
   )
 }
@@ -58,7 +104,7 @@ function EpisodeProgress({ show }: { show: 'computerChronicles' | 'netCafe' }) {
 
   const percent = Math.floor(watched.length / episodes.length * 100)
   return (
-    <div className="hide-sm-down" style={{ width: '300px', position: 'relative' }}>
+    <div className="hide-sm-down" style={{ position: 'relative' }}>
       <ThickLinearProgress variant="determinate" value={percent}/>
       <span style={{ position: 'absolute', top: 0, left: 0, right: 0, textAlign: 'center' }}>{watched.length} / {episodes.length} ({percent}%)</span>
     </div>
@@ -106,7 +152,13 @@ function SearchModal({ open, onClose }: { open: boolean, onClose: () => void }) 
           </button>
         </div>
       </DialogTitle>
-      <DialogContent sx={{ p: 0, maxHeight: 'calc(88vh - 61px)' }} onClick={onClose}>
+      <DialogContent
+        sx={{ p: 0, maxHeight: 'calc(88vh - 61px)' }}
+        onClick={() => {
+          onClose()
+          setQuery('')
+        }}
+      >
         {searchedEpisodes?.map(episode => (
           <Card key={episode.id} linkTo={`/${episode.show}/season/${episode.season}/episode/${episode.episode}`} style={{ height: '120px' }}>
             <CardMedia className="hide-sm-down" image={getThumbnail(episode)} alt={`Episode ${episode.episode}`} style={{ width: '162px', flexShrink: 0 }}/>

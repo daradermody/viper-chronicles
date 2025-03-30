@@ -9,6 +9,9 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
+  if (req.headers.get('X-Password') !== process.env.LOGIN_PASSWORD) {
+    return new Response('You must log in first.', { status: 403 })
+  }
   const { id, watched } = await req.json() as { id: string, watched: boolean }
   if (watched) {
     await redis.sAdd(WATCHED_EPISODES_KEY, id)

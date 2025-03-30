@@ -15,7 +15,7 @@ const server = serve({
     '/api/netCafe/watchedEpisodes': netCafeWatchedEpisodesRoutes,
     '/api/login': loginRoutes
   },
-  development: true
+  development: { hmr: false }
 })
 
 console.log(`🚀 Server running at ${server.url}`)

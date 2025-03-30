@@ -23,11 +23,17 @@ export function useWatchedEpisodes(show: 'computerChronicles' | 'netCafe') {
   async function setWatched(id: string, watched: boolean) {
     try {
       setWatchedEpisodes(prevIds => watched ? [...(prevIds || []), id] : (prevIds || []).filter(prevId => prevId !== id))
-      await fetch(`/api/${show}/watchedEpisodes`, {
+      const response = await fetch(`/api/${show}/watchedEpisodes`, {
         method: 'POST',
         body: JSON.stringify({ id, watched }),
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Password': localStorage.getItem('login_password') || ''
+        },
       })
+      if (!response.ok) {
+        await fetchWatchedEpisodes()
+      }
     } catch (error) {
       setError(error as Error)
       await fetchWatchedEpisodes()

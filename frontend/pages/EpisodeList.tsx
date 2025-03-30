@@ -4,15 +4,14 @@ import {Link, useParams } from 'react-router-dom'
 import {Checkbox, FormControlLabel, IconButton, Typography} from '@mui/material'
 import {ArrowBack} from "@mui/icons-material";
 
-import Header from '../Header'
 import { useData } from '../data/DataProvider'
+import { useAuth } from '../AuthProvider'
 
 export default function EpisodeList() {
   const { show, season } = useParams<{ show: 'computerChronicles' | 'netCafe'; season: string }>()
 
   return (
     <div>
-      <Header/>
       <div style={{ display: 'flex', gap: '4px' }}>
         <Link to={`/${show}`}>
           <IconButton aria-label="Back to season list"><ArrowBack/></IconButton>
@@ -29,6 +28,7 @@ export default function EpisodeList() {
 
 function EpisodeList2({ season }: { season: number }) {
   const episodeData = useData()
+  const {isLoggedIn} = useAuth()
   const show = useParams<{ show: string }>().show as 'computerChronicles' | 'netCafe'
   const { episodes, watched, setWatched } = episodeData[show]
 
@@ -51,7 +51,7 @@ function EpisodeList2({ season }: { season: number }) {
             title={`${episode.episode.toString().padStart(2, '0')}. ${episode.title}`}
             subtitle={episode.releaseDate}
             description={episode.description || '<No description>'}
-            actions={[
+            actions={isLoggedIn ? [
               <FormControlLabel
                 sx={{ display: 'flex', alignItems: 'center' }}
                 control={(
@@ -63,7 +63,7 @@ function EpisodeList2({ season }: { season: number }) {
                 )}
                 label={<Typography variant="caption" sx={{ marginTop: '4px' }}>Watched</Typography>}
               />,
-            ]}
+            ] : undefined}
           />
         </Card>
       ))}

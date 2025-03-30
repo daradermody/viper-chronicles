@@ -1,61 +1,121 @@
-import { ReactNode, useEffect, useState } from 'react'
-import { IconButton, TextField, Typography } from '@mui/material'
+import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from 'react'
+import { Button, IconButton, Popover, TextField, Typography } from '@mui/material'
 import { ArrowCircleRightOutlined } from '@mui/icons-material'
 
+interface AuthContextData {
+  isLoggedIn: boolean;
+  password?: string;
+  isLoggingIn: boolean;
+  LoginButton: () => ReactNode;
+  LogoutButton: () => ReactNode;
+}
+
+const AuthContext = createContext<AuthContextData>({
+  isLoggedIn: false,
+  password: undefined,
+  isLoggingIn: false,
+  LoginButton: () => null,
+  LogoutButton: () => null
+})
+
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [password, setPassword] = useState<string>('')
-  const [isAllowed, setIsAllowed] = useState(false)
-  const [invalidLogin, setInvalidLogin] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
+  const [password, setPassword] = useState<string | undefined>()
+  const [isCheckingSavedCredentials, setIsCheckingSavedCredentials] = useState(() => !!localStorage.getItem('login_password'))
+  const [isLoggingIn, setIsLoggingIn] = useState(false)
 
   useEffect(() => {
     const savedPassword = localStorage.getItem('login_password')
     if (savedPassword) {
-      handleLogin(savedPassword).finally(() => setIsLoading(false))
-    } else {
-      setIsLoading(false)
+      handleLogin(savedPassword)
+        .finally(() => setIsCheckingSavedCredentials(false))
     }
   }, [])
 
   async function handleLogin(password: string) {
-    const response = await fetch('/api/login', { method: 'POST', body: JSON.stringify({ password }) })
-    if (response.ok) {
-      localStorage.setItem('login_password', password)
-      setInvalidLogin(false)
-      setIsAllowed(true)
-    } else {
-      setInvalidLogin(true)
+    try {
+      setIsLoggingIn(true)
+      const response = await fetch('/api/login', { method: 'POST', body: JSON.stringify({ password }) })
+      if (response.ok) {
+        setPassword(password)
+        localStorage.setItem('login_password', password)
+      } else {
+        throw new Error('Invalid password')
+      }
+    } finally {
+      setIsLoggingIn(false)
     }
   }
 
-  if (isLoading) return null
+  function handleLogout() {
+    setPassword(undefined)
+    localStorage.removeItem('login_password')
+  }
 
-  if (isAllowed) {
-    return (
-      <div>
-        {children}
-      </div>
-    )
-  } else {
-    return (
-      <div style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        height: 'calc(100vh - 40px)',
-        flexDirection: 'column',
-      }}
+  const TheLoginButton = useMemo(
+    () => () => <LoginButton isCheckingSavedCredentials={isCheckingSavedCredentials} onSubmit={handleLogin}/>,
+    [isCheckingSavedCredentials]
+  )
+  const TheLogoutButton = useMemo(
+    () => () => <Button onClick={handleLogout} variant="text" color="inherit">Logout</Button>,
+    [isCheckingSavedCredentials]
+  )
+
+  return (
+    <AuthContext value={{
+      isLoggedIn: !!password,
+      password,
+      isLoggingIn,
+      LoginButton: TheLoginButton,
+      LogoutButton: TheLogoutButton
+    }}>
+      {children}
+    </AuthContext>
+  )
+}
+
+function LoginButton({ isCheckingSavedCredentials, onSubmit }: { isCheckingSavedCredentials?: boolean; onSubmit: (password: string) => Promise<void> }) {
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
+  const [password, setPassword] = useState('')
+  const [isLoggingIn, setIsLoggingIn] = useState(false)
+  const [invalidLogin, setInvalidLogin] = useState(false)
+
+  async function handleLogin(password: string) {
+    setInvalidLogin(false)
+    setIsLoggingIn(true)
+    try {
+      await onSubmit(password)
+      setAnchorEl(null)
+    } catch (e) {
+      console.error(e)
+      setInvalidLogin(true)
+    } finally {
+      setIsLoggingIn(false)
+    }
+  }
+
+  return (
+    <>
+      <Button variant="text" onClick={e => setAnchorEl(e.currentTarget)} disableRipple loading={isCheckingSavedCredentials}>
+        Login
+      </Button>
+      <Popover
+        open={!!anchorEl}
+        anchorEl={anchorEl}
+        onClose={() => setAnchorEl(null)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+        onFocus={() => document.getElementById('password-field')?.focus()}
       >
-        <Typography variant="h3" style={{ marginBottom: '40px' }}>Only shlugs allowed</Typography>
-
-        <div style={{ display: 'flex', alignItems: 'flex-start' }}>
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
+        <div style={{ display: 'flex', alignItems: 'center', marginLeft: '20px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', paddingTop: '24px' }}>
             <TextField
+              id="password-field"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter password"
               style={{ paddingTop: '2px' }}
+              disabled={isLoggingIn}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && password) {
                   void handleLogin(password)
@@ -70,11 +130,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               Invalid password
             </Typography>
           </div>
-          <IconButton size="large" aria-label="login" onClick={() => handleLogin(password)}>
+          <IconButton size="large" aria-label="login" onClick={() => handleLogin(password)} disabled={!password} loading={isLoggingIn}>
             <ArrowCircleRightOutlined fontSize="large"/>
           </IconButton>
         </div>
-      </div>
-    )
-  }
+      </Popover>
+    </>
+  )
+}
+
+export function useAuth() {
+  return useContext(AuthContext)
 }

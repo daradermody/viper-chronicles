@@ -13,9 +13,8 @@ export function VideoPlayer({ episode }: { episode: Episode }) {
     if (episode.youtubeId) {
       const player = YTPlayer('yt-player', { videoId: episode.youtubeId });
       setPlayer(player)
-      // void player.loadVideoById(episode.youtubeId!, )
     }
-  }, [])
+  }, [episode])
 
   if (episode.youtubeId) {
     return (
@@ -59,7 +58,7 @@ function YouTubeKeyControl({ player }: { player: YouTubePlayer }) {
       if (numberToTime[e.key] !== undefined) {
         player?.seekTo(numberToTime[e.key], true)
         player?.playVideo()
-      } else if (e.code === 'Space') {
+      } else if (e.code === 'Space' && e.target === document.body) {
         e.preventDefault()
         const state = await player?.getPlayerState()
         if (state === PlayerStates.PLAYING) {

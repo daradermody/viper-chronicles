@@ -3,7 +3,6 @@ import { Season, SeasonList } from '../SeasonList'
 import { useData } from '../data/DataProvider'
 import { useMemo } from 'react'
 import { Episode } from '../../types'
-import Header from '../Header'
 import { Link } from 'react-router-dom'
 import { ArrowBack } from '@mui/icons-material'
 
@@ -18,7 +17,6 @@ export default function ComputerChroniclesSeasonList() {
 
   return (
     <div>
-      <Header/>
       <div style={{ display: 'flex', gap: '4px' }}>
         <Link to="/">
           <IconButton aria-label="Back to show list"><ArrowBack/></IconButton>

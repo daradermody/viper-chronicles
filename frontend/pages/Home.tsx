@@ -1,4 +1,3 @@
-import Header from '../Header'
 import { Card, CardContent, CardMedia } from '../cards/Cards'
 import { Chip } from '@mui/material'
 // @ts-ignore
@@ -7,7 +6,6 @@ import netCafeLogo from '../netCafe.jpg'
 export default function Home() {
   return (
     <div>
-      <Header/>
       <p>Watch and enjoy the magic that Stewart Cheifet and his team created.</p>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
