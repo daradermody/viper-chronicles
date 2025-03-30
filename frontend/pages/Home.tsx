@@ -8,7 +8,7 @@ export default function Home() {
     <div>
       <p>Watch and enjoy the magic that Stewart Cheifet and his team created.</p>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', width: 'fit-content' }}>
         <Card linkTo="/computerChronicles">
           <CardMedia
             style={{ minHeight: '162px' }}
