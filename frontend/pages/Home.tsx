@@ -24,7 +24,7 @@ export default function Home() {
         <Card linkTo="/netCafe">
           <CardMedia image={netCafeLogo} alt="Computer Chronicles"/>
           <CardContent
-            title={<span><b>Net Cafe</b> <Chip color="primary" label="Beta" size="small" sx={{ fontSize: '10px', height: '19px' }}/></span>}
+            title="Net Cafe"
             subtitle="1996–2002"
             description="A spin-off of Computer Chronicles, Net Cafe (or Cheifet's Net Cafe or The Internet Cafe) was a US television series documenting the internet boom of the late 1990s"
           />
