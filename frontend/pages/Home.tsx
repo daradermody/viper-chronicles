@@ -1,7 +1,6 @@
 import { Card, CardContent, CardMedia } from '../cards/Cards'
-import { Chip } from '@mui/material'
 // @ts-ignore
-import netCafeLogo from '../netCafe.jpg'
+import netCafeLogo from '../images/netCafe.jpg'
 
 export default function Home() {
   return (
