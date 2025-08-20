@@ -1,4 +1,4 @@
-import { Close, GitHub, Language, RateReview, YouTube } from '@mui/icons-material'
+import { Close, GitHub, Language, RateReview, YouTube, Cloud } from '@mui/icons-material'
 import { Box, Button, IconButton, Link, Modal, TextField, Typography } from '@mui/material'
 import { ReactNode, useState } from 'react'
 
@@ -12,6 +12,7 @@ export function Footer() {
         <LinkItem label="Francis Higgins" icon={<YouTube/>} href="https://www.youtube.com/@FrancisHiggins"/>
         <LinkItem label="Chronstracker5000" icon={<Language/>} href="https://chronstracker5000.netlify.app/"/>
         <LinkItem label="Feedback" icon={<RateReview/>} onClick={() => setShowFeedbackForm(true)}/>
+        <LinkItem label="GooseCloud" icon={<Cloud/>} href="https://goose-cloud.vercel.app/"/>
       </div>
       <FeedbackForm open={showFeedbackForm} onClose={() => setShowFeedbackForm(false)}/>
     </div>
