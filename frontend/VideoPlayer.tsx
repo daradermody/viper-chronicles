@@ -47,7 +47,7 @@ export function VideoPlayer({ episode }: { episode: Episode }) {
   }
 }
 
-const keys = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+const keys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0']
 
 function YouTubeKeyControl({ player }: { player: YouTubePlayer }) {
   const [showYtControls, setShowYtControls] = useState(false)
@@ -55,16 +55,25 @@ function YouTubeKeyControl({ player }: { player: YouTubePlayer }) {
 
   useEffect(() => {
     async function handleKeydown(e: KeyboardEvent) {
+      console.log(e.code, e.target)
       if (numberToTime[e.key] !== undefined) {
         player?.seekTo(numberToTime[e.key], true)
         player?.playVideo()
-      } else if (e.code === 'Space' && e.target === document.body) {
-        e.preventDefault()
-        const state = await player?.getPlayerState()
-        if (state === PlayerStates.PLAYING) {
-          await player?.pauseVideo()
-        } else {
-          await player?.playVideo()
+      } else if ((e.target as any)?.tagName !== 'INPUT') {
+        if (e.code === 'Space' || e.code === 'KeyK') {
+          e.preventDefault()
+          const state = await player?.getPlayerState()
+          if (state === PlayerStates.PLAYING) {
+            await player?.pauseVideo()
+          } else {
+            await player?.playVideo()
+          }
+        } else if (e.code === 'Comma') {
+          e.preventDefault()
+          player?.seekTo(await player.getCurrentTime() - (1 / 30), true)
+        } else if (e.code === 'Period') {
+          e.preventDefault()
+          player?.seekTo(await player.getCurrentTime() + (1 / 30), true)
         }
       }
     }
@@ -85,6 +94,19 @@ function YouTubeKeyControl({ player }: { player: YouTubePlayer }) {
           <Typography variant="subtitle2" style={{ marginBottom: '8px' }}>
             Choose a time in the video, then press one of the UI keys below. Once set, pressing that key on your physical keyboard jumps to that timestamp.
           </Typography>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <button className="kbc-button kbc-button-xs">K</button>
+            <span>Play/pause</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div>
+              <button className="kbc-button kbc-button-xs">,</button>
+              <button className="kbc-button kbc-button-xs">.</button>
+            </div>
+            <span>Step backward/forward</span>
+          </div>
+
           {keys.map(key => (
             <div key={key} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <button
