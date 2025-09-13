@@ -1,10 +1,10 @@
 import { Episode } from '../types'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { YouTubePlayer } from 'youtube-player/dist/types'
 import YTPlayer from 'youtube-player'
 import PlayerStates from 'youtube-player/dist/constants/PlayerStates'
-import { IconButton, Typography } from '@mui/material'
-import { Keyboard } from '@mui/icons-material'
+import { IconButton, Popover, TextField, Tooltip, Typography } from '@mui/material'
+import { Keyboard, Edit, Check } from '@mui/icons-material'
 
 export function VideoPlayer({ episode }: { episode: Episode }) {
   const [player, setPlayer] = useState<YouTubePlayer>()
@@ -55,12 +55,11 @@ function YouTubeKeyControl({ player }: { player: YouTubePlayer }) {
 
   useEffect(() => {
     async function handleKeydown(e: KeyboardEvent) {
-      console.log(e.code, e.target)
-      if (numberToTime[e.key] !== undefined) {
-        player?.seekTo(numberToTime[e.key], true)
-        player?.playVideo()
-      } else if ((e.target as any)?.tagName !== 'INPUT') {
-        if (e.code === 'Space' || e.code === 'KeyK') {
+      if ((e.target as any)?.tagName !== 'INPUT') {
+        if (numberToTime[e.key] !== undefined) {
+          player?.seekTo(numberToTime[e.key], true)
+          player?.playVideo()
+        } if (e.code === 'Space' || e.code === 'KeyK') {
           e.preventDefault()
           const state = await player?.getPlayerState()
           if (state === PlayerStates.PLAYING) {
@@ -108,20 +107,13 @@ function YouTubeKeyControl({ player }: { player: YouTubePlayer }) {
           </div>
 
           {keys.map(key => (
-            <div key={key} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <button
-                className="kbc-button kbc-button-xs"
-                onClick={async () => {
-                  const time = await player?.getCurrentTime()
-                  if (time !== undefined) {
-                    setNumberToTime(prev => ({ ...prev, [key]: time }))
-                  }
-                }}
-              >
-                {key}
-              </button>
-              {numberToTime[key] !== undefined ? toTimestamp(numberToTime[key]) : <i style={{ color: 'gray' }}>{'<not set>'}</i>}
-            </div>
+            <TimeButton
+              key={key}
+              keyboardKey={key}
+              player={player!}
+              time={numberToTime[key]}
+              onTimeSelect={time => setNumberToTime(prev => ({ ...prev, [key]: time }))}
+            />
           ))}
           <Typography variant="subtitle2" style={{ marginTop: '8px', fontSize: '0.75rem' }}>
             Note: Because of the way YouTube captures mouse focus, you have to click outside the video for the keys to work.
@@ -129,6 +121,98 @@ function YouTubeKeyControl({ player }: { player: YouTubePlayer }) {
         </div>
       )}
     </div>
+  )
+}
+
+interface TimeButtonProps {
+  keyboardKey: string;
+  time?: number;
+  player: YouTubePlayer;
+  onTimeSelect(time: number): void;
+}
+
+function TimeButton({ keyboardKey, time, player, onTimeSelect }: TimeButtonProps) {
+  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
+
+  return (
+    <div className="time-button" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+      <button
+        className="kbc-button kbc-button-xs"
+        onClick={async () => {
+          const time = await player?.getCurrentTime()
+          if (time !== undefined) {
+            onTimeSelect(time)
+          }
+        }}
+      >
+        {keyboardKey}
+      </button>
+
+      {time === undefined ? <i style={{ color: 'gray' }}>{'<not set>'}</i> : toTimestamp(time)}
+
+      <IconButton aria-label="edit" className="time-edit" onClick={e => setAnchorEl(e.currentTarget)}>
+        <Edit/>
+      </IconButton>
+
+      {anchorEl && (
+        <TimestampEditPopover
+          anchorEl={anchorEl}
+          time={time}
+          onClose={() => setAnchorEl(null)}
+          onTimeSelect={time => {
+            onTimeSelect(time)
+            setAnchorEl(null)
+          }}
+        />
+      )}
+    </div>
+  )
+}
+
+interface TimestampEditPopoverProps {
+  anchorEl: HTMLButtonElement;
+  time?: number;
+  onTimeSelect(time: number): void;
+  onClose(): void;
+}
+
+function TimestampEditPopover({ anchorEl, time, onTimeSelect, onClose }: TimestampEditPopoverProps) {
+  const timestamp = useMemo(() => toTimestamp(time || 0), [time])
+  const [editedTime, setEditedTime] = useState(timestamp)
+  const isValidTimestamp = useMemo(() => !isNaN(toSeconds(editedTime)), [editedTime])
+
+  return (
+    <Popover
+      open={!!anchorEl}
+      anchorEl={anchorEl}
+      onClose={onClose}
+      anchorOrigin={{ vertical: 'center', horizontal: 'right' }}
+      transformOrigin={{ vertical: 'center', horizontal: 'right' }}
+      sx={{ d: 'flex', gap: '4px' }}
+    >
+      <TextField
+        variant="outlined" size="small"
+        sx={{ maxWidth: '100px' }}
+        value={editedTime}
+        autoFocus
+        onChange={e => setEditedTime(e.target.value)}
+        onKeyDown={e => {
+          if (e.key === 'Enter' && isValidTimestamp) {
+            onTimeSelect(toSeconds(editedTime))
+            onClose()
+          } else if (e.key === 'Escape') {
+            onClose()
+          }
+        }}
+      />
+      <Tooltip title={isValidTimestamp ? undefined : 'Invalid format'}>
+        <span>
+          <IconButton aria-label="save" onClick={() => onTimeSelect(toSeconds(editedTime))} disabled={!isValidTimestamp}>
+            <Check/>
+          </IconButton>
+        </span>
+      </Tooltip>
+    </Popover>
   )
 }
 
@@ -145,4 +229,28 @@ function toTimestamp(totalSeconds: number): string {
   } else {
     return minsSecs
   }
+}
+
+function toSeconds(timestamp: string): number {
+  // Match [hh:]mm:ss[.SSS] or mm:ss[.SSS] or ss[.SSS]
+  const re = /^(?:(\d+):)?(\d+)(?:\.(\d{1,3}))?$/;
+  const match = timestamp.trim().match(re);
+  if (!match) return NaN;
+
+  const [, h, mOrS, ms] = match;
+  let seconds = 0;
+
+  if (h !== undefined) {
+    // If there's a colon, h is minutes or hours
+    seconds += parseInt(h, 10) * 60;
+    seconds += parseInt(mOrS, 10);
+  } else {
+    seconds += parseInt(mOrS, 10);
+  }
+
+  if (ms !== undefined) {
+    seconds += parseInt(ms.padEnd(3, '0'), 10) / 1000;
+  }
+
+  return seconds;
 }

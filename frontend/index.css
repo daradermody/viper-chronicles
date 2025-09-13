@@ -51,6 +51,18 @@ body {
   flex-grow: 1;
 }
 
+.time-button {
+  .time-edit {
+    visibility: hidden;
+  }
+
+  &:hover {
+    .time-edit {
+      visibility: visible;
+    }
+  }
+}
+
 @media (max-width: 499px) {
   .hide-xs-down {
     display: none;
