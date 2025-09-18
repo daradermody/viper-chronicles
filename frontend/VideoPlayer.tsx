@@ -47,17 +47,18 @@ export function VideoPlayer({ episode }: { episode: Episode }) {
   }
 }
 
-const keys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0']
+const numberKeys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0']
+const letterKeys = ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p']
 
 function YouTubeKeyControl({ player }: { player: YouTubePlayer }) {
   const [showYtControls, setShowYtControls] = useState(false)
-  const [numberToTime, setNumberToTime] = useState<Record<string, number>>({})
+  const [keyToTime, setKeyToTime] = useState<Record<string, number>>({})
 
   useEffect(() => {
     async function handleKeydown(e: KeyboardEvent) {
       if ((e.target as any)?.tagName !== 'INPUT') {
-        if (numberToTime[e.key] !== undefined) {
-          player?.seekTo(numberToTime[e.key], true)
+        if (keyToTime[e.key] !== undefined) {
+          player?.seekTo(keyToTime[e.key], true)
           player?.playVideo()
         } if (e.code === 'Space' || e.code === 'KeyK') {
           e.preventDefault()
@@ -78,7 +79,7 @@ function YouTubeKeyControl({ player }: { player: YouTubePlayer }) {
     }
     document.addEventListener('keydown', handleKeydown)
     return () => document.removeEventListener('keydown', handleKeydown)
-  }, [player, numberToTime])
+  }, [player, keyToTime])
 
   return (
     <div className="hide-sm-down">
@@ -106,15 +107,33 @@ function YouTubeKeyControl({ player }: { player: YouTubePlayer }) {
             <span>Step backward/forward</span>
           </div>
 
-          {keys.map(key => (
-            <TimeButton
-              key={key}
-              keyboardKey={key}
-              player={player!}
-              time={numberToTime[key]}
-              onTimeSelect={time => setNumberToTime(prev => ({ ...prev, [key]: time }))}
-            />
-          ))}
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <div>
+              {numberKeys.map(key => (
+                <TimeButton
+                  key={key}
+                  keyboardKey={key}
+                  player={player!}
+                  time={keyToTime[key]}
+                  onTimeSelect={time => setKeyToTime(prev => ({ ...prev, [key]: time }))}
+                />
+              ))}
+            </div>
+            <div>
+              {letterKeys.map(key => (
+                <TimeButton
+                  key={key}
+                  keyboardKey={key.toUpperCase()}
+                  player={player!}
+                  time={keyToTime[key]}
+                  onTimeSelect={time => {
+                    console.log(time, key)
+                    setKeyToTime(prev => ({ ...prev, [key]: time }))
+                  }}
+                />
+              ))}
+            </div>
+          </div>
           <Typography variant="subtitle2" style={{ marginTop: '8px', fontSize: '0.75rem' }}>
             Note: Because of the way YouTube captures mouse focus, you have to click outside the video for the keys to work.
           </Typography>
@@ -138,6 +157,7 @@ function TimeButton({ keyboardKey, time, player, onTimeSelect }: TimeButtonProps
     <div className="time-button" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
       <button
         className="kbc-button kbc-button-xs"
+        style={{ width: '28px', textAlign: 'center' }}
         onClick={async () => {
           const time = await player?.getCurrentTime()
           if (time !== undefined) {
