@@ -11,7 +11,7 @@ import ComputerChroniclesSeasonList from './pages/ComputerChroniclesSeasonList'
 import NetCafeSeasonList from './pages/NetCafeSeasonList'
 import { DataProvider } from './data/DataProvider'
 import { AuthProvider } from './AuthProvider'
-import { Header } from './Header'
+import { Header } from './header/Header'
 import { Footer } from './Footer'
 
 const elem = document.getElementById('root')!

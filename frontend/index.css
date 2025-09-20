@@ -63,6 +63,21 @@ body {
   }
 }
 
+.spin {
+  animation-name: spin;
+  animation-duration: 4000ms;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  } to {
+    transform: rotate(360deg);
+  }
+}
+
 @media (max-width: 499px) {
   .hide-xs-down {
     display: none;
