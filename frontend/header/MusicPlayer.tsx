@@ -1,4 +1,4 @@
-import {IconButton, ListItemIcon, ListItemText, Menu, MenuItem, Slider} from '@mui/material'
+import {IconButton, ListItemIcon, ListItemText, Menu, MenuItem, Slider, styled} from '@mui/material'
 import {Close, MusicNote, PauseCircleOutline, PlayCircleOutline, VolumeMute, VolumeUp} from '@mui/icons-material'
 import bobsPizza from '../images/bobs_pizza.png'
 import tomatoImg from '../images/tomato.png'
@@ -30,18 +30,7 @@ export function MusicPlayer({onClose}: { onClose?: () => void }) {
 
   const [volume, setVolume] = useState(20)
   return (
-    <div
-      style={{
-        position: 'fixed',
-        bottom: '10px',
-        right: '10px',
-        zIndex: 1000,
-        backgroundColor: 'white',
-        borderRadius: '10px',
-        boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)',
-        marginLeft: '16px',
-        display: 'flex',
-      }}>
+    <div className="background-music-player">
       <VolumeControl volume={volume} onChange={volume => setVolume(volume)}/>
       <PlayPauseButton isPlaying={isPlaying} onClick={() => setIsPlaying(!isPlaying)} disabled={track === undefined}/>
       <TrackSelect
@@ -52,8 +41,8 @@ export function MusicPlayer({onClose}: { onClose?: () => void }) {
           setTrack(track)
         }}
       />
-      <IconButton aria-label="close player" onClick={() => onClose?.()}>
-        <Close/>
+      <IconButton aria-label="close player" onClick={() => onClose?.()} size="large">
+        <Close fontSize="inherit"/>
       </IconButton>
 
       <Player track={track} volume={volume} isPlaying={isPlaying}/>
@@ -66,7 +55,7 @@ function VolumeControl({volume, onChange}: { volume: number, onChange: (volume: 
   const [unmutedVolume, setUnmutedVolume] = useState<undefined | number>(undefined)
   return (
     <div style={{display: 'flex', alignItems: 'center', width: '150px', marginLeft: '16px'}}>
-      <Slider aria-label="Volume" value={volume} onChange={(_e, value) => onChange(value as number)}/>
+      <ColouredSlider aria-label="Volume" value={volume} onChange={(_e, value) => onChange(value as number)}/>
       <IconButton
         aria-label="mute"
         onClick={() => {
@@ -78,17 +67,33 @@ function VolumeControl({volume, onChange}: { volume: number, onChange: (volume: 
             setUnmutedVolume(undefined)
           }
         }}
+        size="large"
       >
-        {!volume ? <VolumeMute style={{marginLeft: '-4px', marginRight: '4px'}}/> : <VolumeUp/>}
+        {!volume ? <VolumeMute style={{marginLeft: '-4px', marginRight: '4px'}} fontSize="inherit"/> : <VolumeUp fontSize="inherit"/>}
       </IconButton>
     </div>
   )
-
 }
+
+const ColouredSlider = styled(Slider)(() => ({
+  color: '#007bff',
+  '& .MuiSlider-thumb': {
+    backgroundColor: '#318d2d',
+  },
+  '& .MuiSlider-track': {
+    backgroundColor: '#318d2d',
+    borderColor: '#318d2d'
+  },
+  '& .MuiSlider-rail': {
+    backgroundColor: '#318d2d'
+  }
+}));
+
+
 function PlayPauseButton({isPlaying, onClick, disabled}: { isPlaying: boolean, onClick: () => void, disabled?: boolean }) {
   return (
-    <IconButton aria-label="play/pause" onClick={() => onClick()} disabled={disabled}>
-      {(isPlaying && !disabled) ? <PauseCircleOutline/> : <PlayCircleOutline/>}
+    <IconButton aria-label="play/pause" onClick={() => onClick()} disabled={disabled} size="large">
+      {(isPlaying && !disabled) ? <PauseCircleOutline fontSize="inherit"/> : <PlayCircleOutline fontSize="inherit"/>}
     </IconButton>
   )
 
@@ -104,16 +109,16 @@ function TrackSelect({track, isPlaying, onChange}: { track?: number, isPlaying?:
 
   return (
     <span>
-      <IconButton onClick={e => setAnchorEl(e.currentTarget)}>
+      <IconButton onClick={e => setAnchorEl(e.currentTarget)} size="large">
         {
           track !== undefined
             ? <img
               src={tracks[track].img}
               className={isPlaying ? 'spin' : ''}
-              style={{borderRadius: '50%', height: '24px', width: '24px', objectFit: 'cover'}}
+              style={{borderRadius: '50%', height: '28px', width: '28px', objectFit: 'cover'}}
               alt="track cover"
             />
-            : <MusicNote/>
+            : <MusicNote fontSize="inherit"/>
         }
       </IconButton>
 

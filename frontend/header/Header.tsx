@@ -61,7 +61,7 @@ export function Header() {
             <MenuItem className="hide-sm-up" onClick={() => setAnchorEl(null)}>
               <Button variant="text" color="inherit" onClick={() => setShowSearch(true)}>Search</Button>
             </MenuItem>
-            <MenuItem className="hide-sm-down" onClick={() => setAnchorEl(null)}>
+            <MenuItem onClick={() => setAnchorEl(null)}>
               <Button variant="text" color="inherit" onClick={() => setShowMusicPlayer(!showMusicPlayer)}>Background music</Button>
             </MenuItem>
             <MenuItem>
