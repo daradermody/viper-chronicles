@@ -1,5 +1,5 @@
-import {IconButton, ListItemIcon, ListItemText, Menu, MenuItem, Slider, styled} from '@mui/material'
-import {Close, MusicNote, PauseCircleOutline, PlayCircleOutline, VolumeMute, VolumeUp} from '@mui/icons-material'
+import {IconButton, ListItemIcon, ListItemText, Menu, MenuItem, Slider, styled, Tooltip, tooltipClasses, TooltipProps} from '@mui/material'
+import {Close, MusicNote, PauseCircleOutline, PlayCircleOutline, Reply, VolumeMute, VolumeUp} from '@mui/icons-material'
 import bobsPizza from '../images/bobs_pizza.png'
 import tomatoImg from '../images/tomato.png'
 import {useEffect, useState} from 'react'
@@ -48,10 +48,9 @@ export function MusicPlayer({onClose}: { onClose?: () => void }) {
       <Player track={track} volume={volume} isPlaying={isPlaying}/>
     </div>
   )
-
 }
-function VolumeControl({volume, onChange}: { volume: number, onChange: (volume: number) => void }) {
 
+function VolumeControl({volume, onChange}: { volume: number, onChange: (volume: number) => void }) {
   const [unmutedVolume, setUnmutedVolume] = useState<undefined | number>(undefined)
   return (
     <div style={{display: 'flex', alignItems: 'center', width: '150px', marginLeft: '16px'}}>
@@ -89,14 +88,28 @@ const ColouredSlider = styled(Slider)(() => ({
   }
 }));
 
-
 function PlayPauseButton({isPlaying, onClick, disabled}: { isPlaying: boolean, onClick: () => void, disabled?: boolean }) {
   return (
-    <IconButton aria-label="play/pause" onClick={() => onClick()} disabled={disabled} size="large">
-      {(isPlaying && !disabled) ? <PauseCircleOutline fontSize="inherit"/> : <PlayCircleOutline fontSize="inherit"/>}
-    </IconButton>
+    <Tooltip
+      className="play-pause-button"
+      enterDelay={0}
+      slotProps={{
+        popper: { style: { height: '34px' } },
+      }}
+      title={disabled && (
+        <div style={{ fontSize: '12px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+          Choose a song
+          <Reply style={{ transform: 'scaleX(-1) rotate(295deg)' }}/>
+        </div>
+      )}
+    >
+      <div>
+        <IconButton aria-label="play/pause" onClick={() => onClick()} disabled={disabled} size="large">
+          {(isPlaying && !disabled) ? <PauseCircleOutline fontSize="inherit"/> : <PlayCircleOutline fontSize="inherit"/>}
+        </IconButton>
+      </div>
+    </Tooltip>
   )
-
 }
 
 function TrackSelect({track, isPlaying, onChange}: { track?: number, isPlaying?: boolean, onChange: (track: number) => void }) {
@@ -108,8 +121,12 @@ function TrackSelect({track, isPlaying, onChange}: { track?: number, isPlaying?:
   }
 
   return (
-    <span>
-      <IconButton onClick={e => setAnchorEl(e.currentTarget)} size="large">
+    <>
+      <IconButton
+        onClick={e => setAnchorEl(e.currentTarget)}
+        size="large"
+        className={track === undefined ? 'coachmark-on-hover' : ''}
+      >
         {
           track !== undefined
             ? <img
@@ -138,7 +155,7 @@ function TrackSelect({track, isPlaying, onChange}: { track?: number, isPlaying?:
           </MenuItem>
         ))}
       </Menu>
-    </span>
+    </>
   )
 }
 
