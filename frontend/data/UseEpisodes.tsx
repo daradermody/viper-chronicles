@@ -7,7 +7,7 @@ export function useEpisodes(show: 'computerChronicles' | 'netCafe') {
   const [error, setError] = useState<Error>()
 
   useEffect(() => {
-    fetch(`/api/${show}/episodes`)
+    fetch(`/api/${show}/episodes`, { cache: 'default' })
       .then(async response => setEpisodes(await response.json()))
       .catch(e => setError(e))
       .finally(() => setLoading(false))

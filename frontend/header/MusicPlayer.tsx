@@ -1,4 +1,4 @@
-import {IconButton, ListItemIcon, ListItemText, Menu, MenuItem, Slider, styled, Tooltip, tooltipClasses, TooltipProps} from '@mui/material'
+import {IconButton, ListItemIcon, ListItemText, Menu, MenuItem, Slider, styled, Tooltip} from '@mui/material'
 import {Close, MusicNote, PauseCircleOutline, PlayCircleOutline, Reply, VolumeMute, VolumeUp} from '@mui/icons-material'
 import bobsPizza from '../images/bobs_pizza.png'
 import tomatoImg from '../images/tomato.png'
@@ -168,7 +168,8 @@ function Player({track, volume, isPlaying}: { track?: number, volume: number, is
 
   useEffect(() => {
     if (track !== undefined) {
-      void player?.cueVideoById(tracks[track].videoId)
+      void player?.loadVideoById(tracks[track].videoId)
+      void player?.pauseVideo()
     }
   }, [track])
 

@@ -11,8 +11,14 @@ export function useWatchedEpisodes(show: 'computerChronicles' | 'netCafe') {
 
   const fetchWatchedEpisodes = useCallback(async () => {
     try {
+      const savedWatchedEpisodes = localStorage.getItem(`watched_${show}`)
+      if (savedWatchedEpisodes) {
+        setWatchedEpisodes(JSON.parse(savedWatchedEpisodes))
+      }
       const res = await fetch(`/api/${show}/watchedEpisodes`)
-      setWatchedEpisodes(await res.json())
+      const responseData = await res.json()
+      setWatchedEpisodes(responseData)
+      localStorage.setItem(`watched_${show}`, JSON.stringify(responseData))
     } catch (e) {
       setError(e as Error)
     } finally {
@@ -22,6 +28,7 @@ export function useWatchedEpisodes(show: 'computerChronicles' | 'netCafe') {
 
   async function setWatched(id: string, watched: boolean) {
     try {
+      localStorage.removeItem(`watched_${show}`)
       setWatchedEpisodes(prevIds => watched ? [...(prevIds || []), id] : (prevIds || []).filter(prevId => prevId !== id))
       const response = await fetch(`/api/${show}/watchedEpisodes`, {
         method: 'POST',
