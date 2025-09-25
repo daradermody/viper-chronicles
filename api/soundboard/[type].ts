@@ -1,5 +1,6 @@
 import fs from 'fs'
 import path from 'path'
+import { randomInt } from 'node:crypto'
 
 export function GET(req: Request) {
   const type = new URL(req.url).searchParams.get('type') as string
@@ -12,7 +13,7 @@ export function GET(req: Request) {
       return Response.json({error: 'No sound files found'}, {status: 404})
     }
 
-    const randomFile = files[Math.floor(Math.random() * files.length)]
+    const randomFile = files[randomInt(files.length)]
     const filePath = path.join(soundsPath, randomFile)
     const fileContent = fs.readFileSync(filePath)
 
