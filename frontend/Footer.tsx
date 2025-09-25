@@ -6,8 +6,8 @@ export function Footer() {
   const [showFeedbackForm, setShowFeedbackForm] = useState(false)
 
   return (
-    <div style={{ minHeight: '60px', backgroundColor: 'lightgray', paddingTop: '10px' }}>
-      <div style={{ maxWidth: '1700px', display: 'flex', justifyContent: 'center', gap: '4px 30px', margin: '0 auto', padding: '0 20px', flexWrap: 'wrap' }}>
+    <div style={{ minHeight: '60px', backgroundColor: 'lightgray', paddingTop: '20px' }}>
+      <div style={{ maxWidth: '1700px', display: 'flex', justifyContent: 'center', gap: '4px 30px', margin: '0 auto', padding: '0 20px', flexWrap: 'wrap', color: 'dimgrey' }}>
         <LinkItem label="GitHub" icon={<GitHub/>} href="https://github.com/daradermody/viper-chronicles"/>
         <LinkItem label="Francis Higgins" icon={<YouTube/>} href="https://www.youtube.com/@FrancisHiggins"/>
         <LinkItem label="Chronstracker5000" icon={<Language/>} href="https://chronstracker5000.netlify.app/"/>

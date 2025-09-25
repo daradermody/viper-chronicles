@@ -1,10 +1,12 @@
-import {IconButton, ListItemIcon, ListItemText, Menu, MenuItem, Slider, styled, Tooltip} from '@mui/material'
-import {Close, MusicNote, PauseCircleOutline, PlayCircleOutline, Reply, VolumeMute, VolumeUp} from '@mui/icons-material'
-import bobsPizza from '../images/bobs_pizza.png'
-import tomatoImg from '../images/tomato.png'
 import {useEffect, useState} from 'react'
+import {IconButton, ListItemIcon, ListItemText, Menu, MenuItem, Tooltip} from '@mui/material'
+import {Close, MusicNote, PauseCircleOutline, PlayCircleOutline, Reply} from '@mui/icons-material'
 import {YouTubePlayer} from 'youtube-player/dist/types'
 import YTPlayer from 'youtube-player'
+import bobsPizza from '../images/bobs_pizza.png'
+import tomatoImg from '../images/tomato.png'
+import tomImg from '../images/tom.png'
+import {VolumeControl} from './VolumeControl'
 
 const tracks = [
   {
@@ -20,15 +22,15 @@ const tracks = [
   {
     title: "Tom's Hip De Hop",
     videoId: 'b1JFoWM_4uQ',
-    img: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTAviPPV_TNRXfywbgL4Evq2AaOwSG64IYdAA&s'
+    img: tomImg
   }
 ]
 
-export function MusicPlayer({onClose}: { onClose?: () => void }) {
+export function MusicPlayer({onClose}: { onClose: () => void }) {
   const [track, setTrack] = useState<number | undefined>(undefined)
   const [isPlaying, setIsPlaying] = useState(false)
-
   const [volume, setVolume] = useState(20)
+
   return (
     <div className="background-music-player">
       <VolumeControl volume={volume} onChange={volume => setVolume(volume)}/>
@@ -41,7 +43,7 @@ export function MusicPlayer({onClose}: { onClose?: () => void }) {
           setTrack(track)
         }}
       />
-      <IconButton aria-label="close player" onClick={() => onClose?.()} size="large">
+      <IconButton aria-label="close player" onClick={() => onClose()} size="large">
         <Close fontSize="inherit"/>
       </IconButton>
 
@@ -49,44 +51,6 @@ export function MusicPlayer({onClose}: { onClose?: () => void }) {
     </div>
   )
 }
-
-function VolumeControl({volume, onChange}: { volume: number, onChange: (volume: number) => void }) {
-  const [unmutedVolume, setUnmutedVolume] = useState<undefined | number>(undefined)
-  return (
-    <div style={{display: 'flex', alignItems: 'center', width: '150px', marginLeft: '16px'}}>
-      <ColouredSlider aria-label="Volume" value={volume} onChange={(_e, value) => onChange(value as number)}/>
-      <IconButton
-        aria-label="mute"
-        onClick={() => {
-          if (volume) {
-            setUnmutedVolume(volume)
-            onChange(0)
-          } else {
-            onChange(unmutedVolume || 20)
-            setUnmutedVolume(undefined)
-          }
-        }}
-        size="large"
-      >
-        {!volume ? <VolumeMute style={{marginLeft: '-4px', marginRight: '4px'}} fontSize="inherit"/> : <VolumeUp fontSize="inherit"/>}
-      </IconButton>
-    </div>
-  )
-}
-
-const ColouredSlider = styled(Slider)(() => ({
-  color: '#007bff',
-  '& .MuiSlider-thumb': {
-    backgroundColor: '#318d2d',
-  },
-  '& .MuiSlider-track': {
-    backgroundColor: '#318d2d',
-    borderColor: '#318d2d'
-  },
-  '& .MuiSlider-rail': {
-    backgroundColor: '#318d2d'
-  }
-}));
 
 function PlayPauseButton({isPlaying, onClick, disabled}: { isPlaying: boolean, onClick: () => void, disabled?: boolean }) {
   return (

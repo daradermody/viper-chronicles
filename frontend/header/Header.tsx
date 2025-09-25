@@ -6,12 +6,14 @@ import {useAuth} from '../AuthProvider'
 import {SearchModal} from './SearchModal'
 import {EpisodeProgress} from './EpisodeProgress'
 import {MusicPlayer} from './MusicPlayer'
+import {Soundboard} from './Soundboard'
 
 export function Header() {
   const [showSearch, setShowSearch] = useState(false)
   const {isLoggedIn, LoginButton, LogoutButton} = useAuth()
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [showMusicPlayer, setShowMusicPlayer] = useState(false)
+  const [showSoundboard, setShowSoundboard] = useState(false)
 
   return (
     <div style={{ backgroundColor: '#ebeaea', width: '100%' }}>
@@ -64,6 +66,9 @@ export function Header() {
             <MenuItem onClick={() => setAnchorEl(null)}>
               <Button variant="text" color="inherit" onClick={() => setShowMusicPlayer(!showMusicPlayer)}>Background music</Button>
             </MenuItem>
+            <MenuItem onClick={() => setAnchorEl(null)}>
+              <Button variant="text" color="inherit" onClick={() => setShowSoundboard(!showSoundboard)}>Soundboard</Button>
+            </MenuItem>
             <MenuItem>
               {isLoggedIn ? <LogoutButton/> : <LoginButton/>}
             </MenuItem>
@@ -71,6 +76,7 @@ export function Header() {
         </div>
 
         <SearchModal open={showSearch} onClose={() => setShowSearch(false)}/>
+        {showSoundboard && <Soundboard onClose={() => setShowSoundboard(false)}/>}
         {showMusicPlayer && <MusicPlayer onClose={() => setShowMusicPlayer(false)}/>}
       </div>
     </div>
