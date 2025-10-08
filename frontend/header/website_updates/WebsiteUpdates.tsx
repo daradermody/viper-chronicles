@@ -2,8 +2,9 @@ import { ReactNode } from 'react'
 import { Box, Card, CardContent, IconButton, Modal, Typography } from '@mui/material'
 import { Close } from '@mui/icons-material'
 import backgroundMusicSoundboard from './background_music_soundboard.png'
+import nameTimestamps from './name_timestamps.png'
 
-export const LATEST_VERSION = 1
+export const LATEST_VERSION = 2
 
 export function WebsiteUpdates({ onClose }: { onClose: () => void }) {
   return (
@@ -30,6 +31,13 @@ export function WebsiteUpdates({ onClose }: { onClose: () => void }) {
         </Typography>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', overflowY: 'auto', maxHeight: '80vh' }}>
+          <Update title="Named timestamps">
+            Video timestamps can now have names so you can keep track of your many samples.
+            <div style={{ display: 'flex', justifyContent: 'center', marginTop: '8px' }} >
+              <img src={nameTimestamps} alt="named timestamps"/>
+            </div>
+          </Update>
+
           <Update title="What's new with you?">
             A "What's new" log has been added so it's easier to find out what new features have been added since your last visit. You're looking right at it!
           </Update>

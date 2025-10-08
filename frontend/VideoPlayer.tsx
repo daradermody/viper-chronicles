@@ -50,15 +50,20 @@ export function VideoPlayer({ episode }: { episode: Episode }) {
 const numberKeys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0']
 const letterKeys = ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p']
 
+interface Timestamp {
+  time: number;
+  name?: string;
+}
+
 function YouTubeKeyControl({ player }: { player: YouTubePlayer }) {
   const [showYtControls, setShowYtControls] = useState(false)
-  const [keyToTime, setKeyToTime] = useState<Record<string, number>>({})
+  const [keyToTime, setKeyToTime] = useState<Record<string, Timestamp>>({})
 
   useEffect(() => {
     async function handleKeydown(e: KeyboardEvent) {
       if ((e.target as any)?.tagName !== 'INPUT') {
-        if (keyToTime[e.key] !== undefined) {
-          player?.seekTo(keyToTime[e.key], true)
+        if (keyToTime[e.key]) {
+          player?.seekTo(keyToTime[e.key].time, true)
           player?.playVideo()
         } if (e.code === 'Space' || e.code === 'KeyK') {
           e.preventDefault()
@@ -87,7 +92,7 @@ function YouTubeKeyControl({ player }: { player: YouTubePlayer }) {
         <Keyboard/>
       </IconButton>
       {showYtControls && (
-        <div style={{ maxWidth: '500px', marginLeft: '8px' }}>
+        <div style={{ maxWidth: '600px', marginLeft: '8px' }}>
           <Typography variant="subtitle2" style={{ marginBottom: '8px' }}>
             You can save video timestamps to your number keys and quickly jump around the video, for example when making a groovy song.
           </Typography>
@@ -108,26 +113,25 @@ function YouTubeKeyControl({ player }: { player: YouTubePlayer }) {
           </div>
 
           <div style={{ display: 'flex', gap: '8px' }}>
-            <div>
+            <div style={{ width: '100%' }}>
               {numberKeys.map(key => (
                 <TimeButton
                   key={key}
                   keyboardKey={key}
                   player={player!}
-                  time={keyToTime[key]}
-                  onTimeSelect={time => setKeyToTime(prev => ({ ...prev, [key]: time }))}
+                  timestamp={keyToTime[key]}
+                  onChange={time => setKeyToTime(prev => ({ ...prev, [key]: time }))}
                 />
               ))}
             </div>
-            <div>
+            <div style={{ width: '100%'}}>
               {letterKeys.map(key => (
                 <TimeButton
                   key={key}
                   keyboardKey={key.toUpperCase()}
                   player={player!}
-                  time={keyToTime[key]}
-                  onTimeSelect={time => {
-                    console.log(time, key)
+                  timestamp={keyToTime[key]}
+                  onChange={time => {
                     setKeyToTime(prev => ({ ...prev, [key]: time }))
                   }}
                 />
@@ -145,12 +149,12 @@ function YouTubeKeyControl({ player }: { player: YouTubePlayer }) {
 
 interface TimeButtonProps {
   keyboardKey: string;
-  time?: number;
+  timestamp?: Timestamp;
   player: YouTubePlayer;
-  onTimeSelect(time: number): void;
+  onChange(timestamp: Timestamp): void;
 }
 
-function TimeButton({ keyboardKey, time, player, onTimeSelect }: TimeButtonProps) {
+function TimeButton({ keyboardKey, timestamp, player, onChange }: TimeButtonProps) {
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
 
   return (
@@ -161,14 +165,16 @@ function TimeButton({ keyboardKey, time, player, onTimeSelect }: TimeButtonProps
         onClick={async () => {
           const time = await player?.getCurrentTime()
           if (time !== undefined) {
-            onTimeSelect(time)
+            onChange({ name: timestamp?.name, time })
           }
         }}
       >
         {keyboardKey}
       </button>
 
-      {time === undefined ? <i style={{ color: 'gray' }}>{'<not set>'}</i> : toTimestamp(time)}
+      <span>
+        {timestamp ? toString(timestamp) : <i style={{ color: 'gray' }}>{'<not set>'}</i>}
+      </span>
 
       <IconButton aria-label="edit" className="time-edit" onClick={e => setAnchorEl(e.currentTarget)}>
         <Edit/>
@@ -177,10 +183,10 @@ function TimeButton({ keyboardKey, time, player, onTimeSelect }: TimeButtonProps
       {anchorEl && (
         <TimestampEditPopover
           anchorEl={anchorEl}
-          time={time}
+          timestamp={timestamp}
           onClose={() => setAnchorEl(null)}
-          onTimeSelect={time => {
-            onTimeSelect(time)
+          onChange={timestamp => {
+            onChange(timestamp)
             setAnchorEl(null)
           }}
         />
@@ -191,14 +197,15 @@ function TimeButton({ keyboardKey, time, player, onTimeSelect }: TimeButtonProps
 
 interface TimestampEditPopoverProps {
   anchorEl: HTMLButtonElement;
-  time?: number;
-  onTimeSelect(time: number): void;
+  timestamp?: Timestamp;
+  onChange(timestamp: Timestamp): void;
   onClose(): void;
 }
 
-function TimestampEditPopover({ anchorEl, time, onTimeSelect, onClose }: TimestampEditPopoverProps) {
-  const timestamp = useMemo(() => toTimestamp(time || 0), [time])
-  const [editedTime, setEditedTime] = useState(timestamp)
+function TimestampEditPopover({ anchorEl, timestamp, onChange, onClose }: TimestampEditPopoverProps) {
+  const formattedTime = useMemo(() => formatSeconds(timestamp?.time || 0), [timestamp])
+  const [editedName, setEditedName] = useState(timestamp?.name || '')
+  const [editedTime, setEditedTime] = useState(formattedTime)
   const isValidTimestamp = useMemo(() => !isNaN(toSeconds(editedTime)), [editedTime])
 
   return (
@@ -208,37 +215,61 @@ function TimestampEditPopover({ anchorEl, time, onTimeSelect, onClose }: Timesta
       onClose={onClose}
       anchorOrigin={{ vertical: 'center', horizontal: 'right' }}
       transformOrigin={{ vertical: 'center', horizontal: 'right' }}
-      sx={{ d: 'flex', gap: '4px' }}
     >
-      <TextField
-        variant="outlined" size="small"
-        sx={{ maxWidth: '100px' }}
-        value={editedTime}
-        autoFocus
-        onChange={e => setEditedTime(e.target.value)}
-        onKeyDown={e => {
-          if (e.key === 'Enter' && isValidTimestamp) {
-            onTimeSelect(toSeconds(editedTime))
-            onClose()
-          } else if (e.key === 'Escape') {
-            onClose()
-          }
-        }}
-      />
-      <Tooltip title={isValidTimestamp ? undefined : 'Invalid format'}>
-        <span>
-          <IconButton aria-label="save" onClick={() => onTimeSelect(toSeconds(editedTime))} disabled={!isValidTimestamp}>
-            <Check/>
-          </IconButton>
-        </span>
-      </Tooltip>
+      <div style={{ display: 'flex', gap: '4px', padding: '4px', alignItems: 'center' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+          <TextField
+            variant="outlined"
+            size="small"
+            sx={{ maxWidth: '150px' }}
+            value={editedTime}
+            autoFocus
+            onChange={e => setEditedTime(e.target.value)}
+            onKeyDown={e => {
+              if (e.key === 'Enter' && isValidTimestamp) {
+                onChange({ name: editedName, time: toSeconds(editedTime) })
+                onClose()
+              } else if (e.key === 'Escape') {
+                onClose()
+              }
+            }}
+          />
+          <TextField
+            variant="outlined"
+            size="small"
+            sx={{ maxWidth: '150px' }}
+            value={editedName}
+            placeholder="Name (optional)"
+            onChange={e => setEditedName(e.target.value)}
+            onKeyDown={e => {
+              if (e.key === 'Enter' && isValidTimestamp) {
+                onChange({ name: editedName, time: toSeconds(editedTime) })
+                onClose()
+              } else if (e.key === 'Escape') {
+                onClose()
+              }
+            }}
+          />
+          </div>
+        <Tooltip title={isValidTimestamp ? undefined : 'Invalid format'}>
+          <span>
+            <IconButton aria-label="save" onClick={() => onChange({ name: editedName, time: toSeconds(editedTime) })} disabled={!isValidTimestamp}>
+              <Check/>
+            </IconButton>
+          </span>
+        </Tooltip>
+      </div>
     </Popover>
   )
 }
 
-function toTimestamp(totalSeconds: number): string {
-  const hours = Math.floor(totalSeconds / 3600)
-  const remaining = totalSeconds % 3600
+function toString(timestamp: Timestamp): string {
+  return timestamp.name || formatSeconds(timestamp.time)
+}
+
+function formatSeconds(secondsToConvert: number): string {
+  const hours = Math.floor(secondsToConvert / 3600)
+  const remaining = secondsToConvert % 3600
   const minutes = Math.floor(remaining / 60)
   const remainingSeconds = remaining % 60
   const seconds = Math.floor(remainingSeconds)

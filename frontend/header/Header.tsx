@@ -1,7 +1,7 @@
-import { Badge, Button, IconButton, Menu, MenuItem } from '@mui/material'
+import { Badge, Button, IconButton, Menu, MenuItem as MuiMenuItem } from '@mui/material'
 import {Link} from 'react-router-dom'
 import {Menu as MenuIcon, Search} from '@mui/icons-material'
-import { useMemo, useState } from 'react'
+import { ReactNode, useMemo, useState } from 'react'
 import {useAuth} from '../AuthProvider'
 import {SearchModal} from './SearchModal'
 import {EpisodeProgress} from './EpisodeProgress'
@@ -73,26 +73,18 @@ export function Header() {
               <MenuIcon/>
             </IconButton>
           </Badge>
-          <Menu anchorEl={anchorEl} open={!!anchorEl} onClose={() => setAnchorEl(null)}>
-            <MenuItem className="hide-sm-up" onClick={() => setAnchorEl(null)}>
-              <Button variant="text" color="inherit" onClick={() => setShowSearch(true)}>Search</Button>
-            </MenuItem>
-            <MenuItem onClick={() => setAnchorEl(null)}>
-              <Button variant="text" color="inherit" onClick={() => setShowMusicPlayer(!showMusicPlayer)}>Background music</Button>
-            </MenuItem>
-            <MenuItem onClick={() => setAnchorEl(null)}>
-              <Button variant="text" color="inherit" onClick={() => setShowSoundboard(!showSoundboard)}>Soundboard</Button>
-            </MenuItem>
-            <MenuItem onClick={() => setAnchorEl(null)}>
-              <Badge variant="dot" color="secondary" invisible={!showUpdatesBadge} slotProps={{ badge: { style: { top: '10px', right: '4px' } } }}>
-                <Button variant="text" color="inherit" onClick={handleShowUpdatesClick}>
-                  What's new
-                </Button>
+          <Menu anchorEl={anchorEl} open={!!anchorEl} onClick={() => setAnchorEl(null)} onClose={() => setAnchorEl(null)}>
+            <MenuItem className="hide-sm-up" onClick={() => setShowSearch(true)}>Search</MenuItem>
+            <MenuItem onClick={() => setShowMusicPlayer(!showMusicPlayer)}>Background music</MenuItem>
+            <MenuItem onClick={() => setShowSoundboard(!showSoundboard)}>Soundboard</MenuItem>
+            <MenuItem onClick={handleShowUpdatesClick}>
+              <Badge variant="dot" color="secondary" invisible={!showUpdatesBadge} slotProps={{ badge: { style: { top: '4px', right: '-6px' } } }}>
+                What's new
               </Badge>
             </MenuItem>
-            <MenuItem>
+            <MuiMenuItem style={{ padding: 0 }}>
               {isLoggedIn ? <LogoutButton/> : <LoginButton/>}
-            </MenuItem>
+            </MuiMenuItem>
           </Menu>
         </div>
 
@@ -102,5 +94,15 @@ export function Header() {
         {showUpdates && <WebsiteUpdates onClose={() => setShowUpdates(false)}/>}
       </div>
     </div>
+  )
+}
+
+function MenuItem({ children, className, onClick }: { children: ReactNode; className?: string; onClick: () => void }) {
+  return (
+    <MuiMenuItem className={className} style={{ padding: 0 }}>
+      <Button variant="text" color="inherit" onClick={onClick} style={{ width: '100%', justifyContent: 'start', padding: '8px 16px' }}>
+        {children}
+      </Button>
+    </MuiMenuItem>
   )
 }

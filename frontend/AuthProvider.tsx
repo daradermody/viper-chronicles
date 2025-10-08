@@ -56,7 +56,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [isCheckingSavedCredentials]
   )
   const TheLogoutButton = useMemo(
-    () => () => <Button onClick={handleLogout} variant="text" color="inherit">Logout</Button>,
+    () => () => <Button onClick={handleLogout} variant="text" color="inherit" style={{ width: '100%', justifyContent: 'start', padding: '8px 16px' }}>Logout</Button>,
     [isCheckingSavedCredentials]
   )
 
@@ -95,7 +95,16 @@ function LoginButton({ isCheckingSavedCredentials, onSubmit }: { isCheckingSaved
 
   return (
     <>
-      <Button variant="text" onClick={e => setAnchorEl(e.currentTarget)} disableRipple loading={isCheckingSavedCredentials}>
+      <Button
+        variant="text"
+        onClick={e => {
+          e.stopPropagation()
+          setAnchorEl(e.currentTarget)
+        }}
+        disableRipple
+        loading={isCheckingSavedCredentials}
+        style={{ width: '100%', justifyContent: 'start', padding: '8px 16px' }}
+      >
         Login
       </Button>
       <Popover
