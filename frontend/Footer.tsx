@@ -81,5 +81,6 @@ function FeedbackForm({ open, onClose }: { open: boolean; onClose: () => void })
           <Button variant="contained" onClick={sendFeedback} disabled={!message} loading={isSending}>Send</Button>
         </div>
       </Box>
-    </Modal>  )
+    </Modal>
+  )
 }

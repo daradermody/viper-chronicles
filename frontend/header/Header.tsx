@@ -1,12 +1,13 @@
-import {Button, IconButton, Menu, MenuItem,} from '@mui/material'
+import { Badge, Button, IconButton, Menu, MenuItem } from '@mui/material'
 import {Link} from 'react-router-dom'
 import {Menu as MenuIcon, Search} from '@mui/icons-material'
-import {useState} from 'react'
+import { useMemo, useState } from 'react'
 import {useAuth} from '../AuthProvider'
 import {SearchModal} from './SearchModal'
 import {EpisodeProgress} from './EpisodeProgress'
 import {MusicPlayer} from './MusicPlayer'
 import {Soundboard} from './Soundboard'
+import { LATEST_VERSION, WebsiteUpdates } from './website_updates/WebsiteUpdates'
 
 export function Header() {
   const [showSearch, setShowSearch] = useState(false)
@@ -14,6 +15,17 @@ export function Header() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [showMusicPlayer, setShowMusicPlayer] = useState(false)
   const [showSoundboard, setShowSoundboard] = useState(false)
+  const [showUpdates, setShowUpdates] = useState(false)
+
+  const storedLastSeenVersion = useMemo(() => localStorage.getItem('lastSeenVersion') || '0', [])
+  const [lastSeenVersion, setLastSeenVersion] = useState(storedLastSeenVersion)
+  const showUpdatesBadge = lastSeenVersion !== `${LATEST_VERSION}`
+
+  function handleShowUpdatesClick() {
+    setShowUpdates(true)
+    localStorage.setItem('lastSeenVersion', `${LATEST_VERSION}`)
+    setLastSeenVersion(`${LATEST_VERSION}`)
+  }
 
   return (
     <div style={{ backgroundColor: '#ebeaea', width: '100%' }}>
@@ -56,9 +68,11 @@ export function Header() {
             <Search/>
           </IconButton>
 
-          <IconButton onClick={e => setAnchorEl(e.currentTarget)}>
-            <MenuIcon/>
-          </IconButton>
+          <Badge variant="dot" color="secondary" invisible={!showUpdatesBadge} slotProps={{ badge: { style: { top: '10px', right: '4px' } } }}>
+            <IconButton onClick={e => setAnchorEl(e.currentTarget)}>
+              <MenuIcon/>
+            </IconButton>
+          </Badge>
           <Menu anchorEl={anchorEl} open={!!anchorEl} onClose={() => setAnchorEl(null)}>
             <MenuItem className="hide-sm-up" onClick={() => setAnchorEl(null)}>
               <Button variant="text" color="inherit" onClick={() => setShowSearch(true)}>Search</Button>
@@ -69,6 +83,13 @@ export function Header() {
             <MenuItem onClick={() => setAnchorEl(null)}>
               <Button variant="text" color="inherit" onClick={() => setShowSoundboard(!showSoundboard)}>Soundboard</Button>
             </MenuItem>
+            <MenuItem onClick={() => setAnchorEl(null)}>
+              <Badge variant="dot" color="secondary" invisible={!showUpdatesBadge} slotProps={{ badge: { style: { top: '10px', right: '4px' } } }}>
+                <Button variant="text" color="inherit" onClick={handleShowUpdatesClick}>
+                  What's new
+                </Button>
+              </Badge>
+            </MenuItem>
             <MenuItem>
               {isLoggedIn ? <LogoutButton/> : <LoginButton/>}
             </MenuItem>
@@ -78,8 +99,8 @@ export function Header() {
         <SearchModal open={showSearch} onClose={() => setShowSearch(false)}/>
         {showSoundboard && <Soundboard onClose={() => setShowSoundboard(false)}/>}
         {showMusicPlayer && <MusicPlayer onClose={() => setShowMusicPlayer(false)}/>}
+        {showUpdates && <WebsiteUpdates onClose={() => setShowUpdates(false)}/>}
       </div>
     </div>
   )
 }
-
