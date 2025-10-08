@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react'
+import {useEffect, useMemo, useState} from 'react'
 import {IconButton, ListItemIcon, ListItemText, Menu, MenuItem, Tooltip} from '@mui/material'
 import {Close, MusicNote, PauseCircleOutline, PlayCircleOutline, Reply} from '@mui/icons-material'
 import {YouTubePlayer} from 'youtube-player/dist/types'
@@ -12,24 +12,31 @@ const tracks = [
   {
     title: 'Bob\'s Pizzeria',
     videoId: '2Sc3fXLK4FE',
-    img: bobsPizza
+    img: bobsPizza,
+    volumeScaler: 0.6
   },
   {
     title: 'Tomato Store',
     videoId: 'lsibwSkp0as',
-    img: tomatoImg
+    img: tomatoImg,
+    volumeScaler: 0.3
   },
   {
     title: "Tom's Hip De Hop",
     videoId: 'b1JFoWM_4uQ',
-    img: tomImg
+    img: tomImg,
+    volumeScaler: 0.2
   }
 ]
 
 export function MusicPlayer({onClose}: { onClose: () => void }) {
   const [track, setTrack] = useState<number | undefined>(undefined)
   const [isPlaying, setIsPlaying] = useState(false)
-  const [volume, setVolume] = useState(20)
+  const [volume, setVolume] = useState(30)
+  const scaledVolume = useMemo(() => {
+    const scaler = track === undefined ? 1 : tracks[track].volumeScaler ?? 1
+    return (volume / 100) ** 2.5 * 100 * scaler
+  }, [track, volume])
 
   return (
     <div className="background-music-player">
@@ -47,7 +54,7 @@ export function MusicPlayer({onClose}: { onClose: () => void }) {
         <Close fontSize="inherit"/>
       </IconButton>
 
-      <Player track={track} volume={volume} isPlaying={isPlaying}/>
+      <Player track={track} volume={scaledVolume} isPlaying={isPlaying}/>
     </div>
   )
 }

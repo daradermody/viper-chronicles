@@ -9,11 +9,11 @@ import viperImg from '../images/viper.png'
 const gainNodes: GainNode[] = []
 
 export function Soundboard({onClose}: {onClose: () => void}) {
-  const [volume, setVolume] = useState(20)
+  const [volume, setVolume] = useState(30)
 
   useEffect(() => {
     for (const gainNode of gainNodes) {
-      gainNode.gain.value = volume / 100
+      gainNode.gain.value = (volume / 100) ** 2.5
     }
   }, [volume])
 
