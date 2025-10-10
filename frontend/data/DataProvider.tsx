@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useContext } from 'react'
+import {createContext, ReactNode, useCallback, useContext, useMemo} from 'react'
 import { Episode } from '../../types'
 import { useEpisodes } from './UseEpisodes'
 import { useWatchedEpisodes } from './UseWatchedEpisodes'
@@ -51,4 +51,35 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
 export function useData() {
   return useContext(DataProviderContext) as Data
+}
+
+export function useEpisode(show: 'computerChronicles' | 'netCafe', season: number, episodeNumber: number): EpisodeInfo | undefined {
+  const episodeData = useData()
+  const { episodes, watched, setWatched } = episodeData[show]
+
+  const episode = useMemo(() => {
+    return episodes.find(ep => ep.season === season && ep.episode === episodeNumber)
+  }, [episodeData, show, season, episodeNumber])
+
+  const episodeWatched = useMemo(() => !!episode && watched.includes(episode.id), [watched, episode])
+
+  const setEpisodeWatched = useCallback((isWatched: boolean) => {
+    if (episode) {
+      setWatched(episode.id, isWatched)
+    }
+  }, [])
+
+  if (!episode) return undefined
+
+  return {
+    episode,
+    watched: episodeWatched,
+    setWatched: setEpisodeWatched
+  }
+}
+
+interface EpisodeInfo {
+  episode: Episode;
+  watched: boolean;
+  setWatched(watched: boolean): void;
 }

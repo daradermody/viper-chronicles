@@ -1,10 +1,13 @@
 import { Episode } from '../types'
-import { useEffect, useMemo, useState } from 'react'
+import {useCallback, useEffect, useMemo, useState} from 'react'
 import { YouTubePlayer } from 'youtube-player/dist/types'
 import YTPlayer from 'youtube-player'
 import PlayerStates from 'youtube-player/dist/constants/PlayerStates'
 import { IconButton, Popover, TextField, Tooltip, Typography } from '@mui/material'
-import { Keyboard, Edit, Check } from '@mui/icons-material'
+import {Keyboard, Edit, Check, Delete} from '@mui/icons-material'
+import {useAuth} from './AuthProvider'
+import {useParams} from 'react-router-dom'
+import {useEpisode} from './data/DataProvider'
 
 export function VideoPlayer({ episode }: { episode: Episode }) {
   const [player, setPlayer] = useState<YouTubePlayer>()
@@ -57,13 +60,15 @@ interface Timestamp {
 
 function YouTubeKeyControl({ player }: { player: YouTubePlayer }) {
   const [showYtControls, setShowYtControls] = useState(false)
-  const [keyToTime, setKeyToTime] = useState<Record<string, Timestamp>>({})
+  const { show, season, episode: episodeNumber } = useParams<{ show: 'computerChronicles' | 'netCafe'; season: string; episode: string }>()
+  const { episode } = useEpisode(show!, Number(season), Number(episodeNumber))!
+  const { timestamps, loading, setTimestamps } = useTimestamps(show!, episode.id)
 
   useEffect(() => {
     async function handleKeydown(e: KeyboardEvent) {
       if ((e.target as any)?.tagName !== 'INPUT') {
-        if (keyToTime[e.key]) {
-          player?.seekTo(keyToTime[e.key].time, true)
+        if (timestamps?.[e.key]) {
+          player?.seekTo(timestamps[e.key].time, true)
           player?.playVideo()
         } if (e.code === 'Space' || e.code === 'KeyK') {
           e.preventDefault()
@@ -84,11 +89,11 @@ function YouTubeKeyControl({ player }: { player: YouTubePlayer }) {
     }
     document.addEventListener('keydown', handleKeydown)
     return () => document.removeEventListener('keydown', handleKeydown)
-  }, [player, keyToTime])
+  }, [player, timestamps])
 
   return (
     <div className="hide-sm-down">
-      <IconButton onClick={() => setShowYtControls(prev => !prev)}>
+      <IconButton loading={loading} onClick={() => setShowYtControls(prev => !prev)}>
         <Keyboard/>
       </IconButton>
       {showYtControls && (
@@ -119,8 +124,13 @@ function YouTubeKeyControl({ player }: { player: YouTubePlayer }) {
                   key={key}
                   keyboardKey={key}
                   player={player!}
-                  timestamp={keyToTime[key]}
-                  onChange={time => setKeyToTime(prev => ({ ...prev, [key]: time }))}
+                  timestamp={timestamps?.[key]}
+                  onChange={timestamp => setTimestamps({ ...timestamps, [key]: timestamp })}
+                  onReset={() => {
+                    const newTimestamps = { ...timestamps }
+                    delete newTimestamps[key]
+                    setTimestamps(newTimestamps)
+                  }}
                 />
               ))}
             </div>
@@ -130,9 +140,12 @@ function YouTubeKeyControl({ player }: { player: YouTubePlayer }) {
                   key={key}
                   keyboardKey={key.toUpperCase()}
                   player={player!}
-                  timestamp={keyToTime[key]}
-                  onChange={time => {
-                    setKeyToTime(prev => ({ ...prev, [key]: time }))
+                  timestamp={timestamps?.[key]}
+                  onChange={timestamp => setTimestamps({ ...timestamps, [key]: timestamp })}
+                  onReset={() => {
+                    const newTimestamps = { ...timestamps }
+                    delete newTimestamps[key]
+                    setTimestamps(newTimestamps)
                   }}
                 />
               ))}
@@ -152,13 +165,14 @@ interface TimeButtonProps {
   timestamp?: Timestamp;
   player: YouTubePlayer;
   onChange(timestamp: Timestamp): void;
+  onReset(): void;
 }
 
-function TimeButton({ keyboardKey, timestamp, player, onChange }: TimeButtonProps) {
+function TimeButton({ keyboardKey, timestamp, player, onChange, onReset }: TimeButtonProps) {
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
 
   return (
-    <div className="time-button" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+    <div className="timestamp-button" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
       <button
         className="kbc-button kbc-button-xs"
         style={{ width: '28px', textAlign: 'center' }}
@@ -176,9 +190,14 @@ function TimeButton({ keyboardKey, timestamp, player, onChange }: TimeButtonProp
         {timestamp ? toString(timestamp) : <i style={{ color: 'gray' }}>{'<not set>'}</i>}
       </span>
 
-      <IconButton aria-label="edit" className="time-edit" onClick={e => setAnchorEl(e.currentTarget)}>
-        <Edit/>
-      </IconButton>
+      <div className="timestamp-actions">
+        <IconButton aria-label="edit" size="small" onClick={e => setAnchorEl(e.currentTarget)}>
+          <Edit/>
+        </IconButton>
+        <IconButton aria-label="delete" size="small" onClick={onReset}>
+          <Delete/>
+        </IconButton>
+      </div>
 
       {anchorEl && (
         <TimestampEditPopover
@@ -304,4 +323,49 @@ function toSeconds(timestamp: string): number {
   }
 
   return seconds;
+}
+
+function useTimestamps(show: 'computerChronicles' | 'netCafe', episodeId: string): UseTimestampsResult {
+  const [timestamps, setTimestamps] = useState<Record<string, Timestamp>>()
+  const [loading, setLoading] = useState(true)
+  const {isLoggedIn, password} = useAuth()
+
+  useEffect(() => {
+    async function fetchTimestamps() {
+      const response = await fetch(`/api/timestamps/${show}/${episodeId}`)
+      if (!response.ok) {
+        console.error(response.statusText)
+        setTimestamps({})
+      }
+      const data = await response.json() as Record<string, Timestamp>
+      setTimestamps(data)
+      setLoading(false)
+    }
+    void fetchTimestamps()
+  }, [show, episodeId])
+
+  const setTimestampsFn = useCallback(async (newTimestamps: Record<string, Timestamp>) => {
+    setTimestamps(newTimestamps)
+    if (isLoggedIn) {
+      const response = await fetch(`/api/timestamps/${show}/${episodeId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Password': password || ''
+        },
+        body: JSON.stringify(newTimestamps)
+      })
+      if (!response.ok) {
+        console.error('Failed to save timestamps:', response.statusText)
+      }
+    }
+  }, [show, episodeId, isLoggedIn, password])
+
+  return { timestamps, loading, setTimestamps: setTimestampsFn }
+}
+
+interface UseTimestampsResult {
+  timestamps?: Record<string, Timestamp>;
+  loading: boolean;
+  setTimestamps(newTimestamps: Record<string, Timestamp>): void;
 }

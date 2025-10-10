@@ -4,22 +4,14 @@ import {Link, useParams} from 'react-router-dom'
 import {ArrowBack} from '@mui/icons-material'
 
 import {Episode} from '../../types'
-import { useData } from '../data/DataProvider'
+import {useEpisode} from '../data/DataProvider'
 import {VideoPlayer} from '../VideoPlayer'
 import { useAuth } from '../AuthProvider'
 
 export default function EpisodeInfo() {
   const { show, season, episode: episodeNumber } = useParams<{ show: 'computerChronicles' | 'netCafe'; season: string; episode: string }>()
-  const episodeData = useData()
+  const {episode, watched, setWatched} = useEpisode(show!, Number(season), Number(episodeNumber))!
   const {isLoggedIn} = useAuth()
-  const { episodes, watched, setWatched } = episodeData[show!]
-
-  const episode = useMemo(
-    () => episodes?.find(ep => ep.season === Number(season) && ep.episode === Number(episodeNumber)),
-    [episodes, season, episodeNumber],
-  )!
-
-  if(!episode) return null;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -39,7 +31,7 @@ export default function EpisodeInfo() {
 
       {isLoggedIn && (
         <FormControlLabel
-          control={<Checkbox checked={watched?.includes(episode.id)} onChange={e => setWatched(episode.id, e.target.checked)}/>}
+          control={<Checkbox checked={watched} onChange={e => setWatched(e.target.checked)}/>}
           label={<Typography variant="caption" sx={{ marginTop: '4px' }}>Watched</Typography>}
         />
       )}

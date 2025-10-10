@@ -6,6 +6,7 @@ import * as netCafeEpisodesRoutes from './api/netCafe/episodes'
 import * as netCafeWatchedEpisodesRoutes from './api/netCafe/watchedEpisodes'
 import * as loginRoutes from './api/login'
 import * as soundBoardRoutes from './api/soundboard/[type]'
+import * as timestampRoutes from './api/timestamps/[show]/[episode]'
 
 const server = serve({
   routes: {
@@ -19,6 +20,16 @@ const server = serve({
       GET: req => {
         const vercelReq = new Request(req.url + `?type=${req.params.type}`)
         return soundBoardRoutes.GET(vercelReq)
+      }
+    },
+    '/api/timestamps/:show/:episode': {
+      GET: req => {
+        const vercelReq = new Request(req.url + `?show=${req.params.show}&episode=${req.params.episode}`)
+        return timestampRoutes.GET(vercelReq)
+      },
+      POST: req => {
+        const vercelReq = new Request(req.url + `?show=${req.params.show}&episode=${req.params.episode}`, { headers: req.headers, body: req.body })
+        return timestampRoutes.POST(vercelReq)
       }
     }
   },

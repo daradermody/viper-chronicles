@@ -51,13 +51,13 @@ body {
   flex-grow: 1;
 }
 
-.time-button {
-  .time-edit {
+.timestamp-button {
+  .timestamp-actions {
     visibility: hidden;
   }
 
   &:hover {
-    .time-edit {
+    .timestamp-actions {
       visibility: visible;
     }
   }

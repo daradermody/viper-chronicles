@@ -4,7 +4,7 @@ import { Close } from '@mui/icons-material'
 import backgroundMusicSoundboard from './background_music_soundboard.png'
 import nameTimestamps from './name_timestamps.png'
 
-export const LATEST_VERSION = 2
+export const LATEST_VERSION = 3
 
 export function WebsiteUpdates({ onClose }: { onClose: () => void }) {
   return (
@@ -31,6 +31,10 @@ export function WebsiteUpdates({ onClose }: { onClose: () => void }) {
         </Typography>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', overflowY: 'auto', maxHeight: '80vh' }}>
+          <Update title="Remember the time">
+            Video timestamps are now saved permanently (but only if you're logged in!)
+          </Update>
+
           <Update title="Named timestamps">
             Video timestamps can now have names so you can keep track of your many samples.
             <div style={{ display: 'flex', justifyContent: 'center', marginTop: '8px' }} >
