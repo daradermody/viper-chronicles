@@ -63,7 +63,7 @@ function YouTubeKeyControl({ player }: { player: YouTubePlayer }) {
   const { show, season, episode: episodeNumber } = useParams<{ show: 'computerChronicles' | 'netCafe'; season: string; episode: string }>()
   const { episode } = useEpisode(show!, Number(season), Number(episodeNumber))!
   const { timestamps, loading, setTimestamps } = useTimestamps(show!, episode.id)
-  const activeKey = useRef("")
+  const pressing = useRef(false)
   const [momentaryMode, setMomentaryMode] = useState(false)
 
   useEffect(() => {
@@ -71,7 +71,7 @@ function YouTubeKeyControl({ player }: { player: YouTubePlayer }) {
       if(momentaryMode && e.repeat) return // stop repeating events 
       if ((e.target as any)?.tagName !== 'INPUT') {
         if (timestamps?.[e.key]) {
-          if(momentaryMode) activeKey.current = e.key
+          if(momentaryMode) pressing.current = true
           player?.seekTo(timestamps[e.key].time, true)
           player?.playVideo()
         } if (e.code === 'Space' || e.code === 'KeyK') {
@@ -94,8 +94,8 @@ function YouTubeKeyControl({ player }: { player: YouTubePlayer }) {
     async function handleKeyup(e: KeyboardEvent){
       if(!momentaryMode) return
       if ((e.target as any)?.tagName !== 'INPUT') {
-        if (activeKey.current) {
-          activeKey.current = ""
+        if (pressing.current) {
+          pressing.current = false
           player?.pauseVideo()
         }
       }
