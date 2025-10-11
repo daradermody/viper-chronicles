@@ -1,9 +1,9 @@
 import { Episode } from '../types'
-import {useCallback, useEffect, useMemo, useState} from 'react'
+import {KeyboardEvent, useCallback, useEffect, useMemo, useState, useRef} from 'react'
 import { YouTubePlayer } from 'youtube-player/dist/types'
 import YTPlayer from 'youtube-player'
 import PlayerStates from 'youtube-player/dist/constants/PlayerStates'
-import { IconButton, Popover, TextField, Tooltip, Typography } from '@mui/material'
+import { IconButton, Popover, TextField, Tooltip, Typography, Checkbox, FormControlLabel } from '@mui/material'
 import {Keyboard, Edit, Check, Delete} from '@mui/icons-material'
 import {useAuth} from './AuthProvider'
 import {useParams} from 'react-router-dom'
@@ -63,11 +63,15 @@ function YouTubeKeyControl({ player }: { player: YouTubePlayer }) {
   const { show, season, episode: episodeNumber } = useParams<{ show: 'computerChronicles' | 'netCafe'; season: string; episode: string }>()
   const { episode } = useEpisode(show!, Number(season), Number(episodeNumber))!
   const { timestamps, loading, setTimestamps } = useTimestamps(show!, episode.id)
+  const activeKey = useRef("")
+  const [momentaryMode, setMomentaryMode] = useState(false)
 
   useEffect(() => {
     async function handleKeydown(e: KeyboardEvent) {
+      if(momentaryMode && e.repeat) return // stop repeating events 
       if ((e.target as any)?.tagName !== 'INPUT') {
         if (timestamps?.[e.key]) {
+          if(momentaryMode) activeKey.current = e.key
           player?.seekTo(timestamps[e.key].time, true)
           player?.playVideo()
         } if (e.code === 'Space' || e.code === 'KeyK') {
@@ -87,9 +91,26 @@ function YouTubeKeyControl({ player }: { player: YouTubePlayer }) {
         }
       }
     }
+    async function handleKeyup(e: KeyboardEvent){
+      if(!momentaryMode) return
+      if ((e.target as any)?.tagName !== 'INPUT') {
+        if (activeKey.current) {
+          activeKey.current = ""
+          player?.pauseVideo()
+        }
+      }
+    }
     document.addEventListener('keydown', handleKeydown)
-    return () => document.removeEventListener('keydown', handleKeydown)
-  }, [player, timestamps])
+    document.addEventListener('keyup', handleKeyup)
+    return () => {
+      document.removeEventListener('keydown', handleKeydown)
+      document.removeEventListener('keyup', handleKeyup)
+    }
+  }, [player, timestamps, momentaryMode])
+
+  function handleMomentaryModeChange(event: React.ChangeEvent<HTMLInputElement>, checked: boolean){
+    setMomentaryMode(checked)
+  }
 
   return (
     <div className="hide-sm-down">
@@ -104,7 +125,11 @@ function YouTubeKeyControl({ player }: { player: YouTubePlayer }) {
           <Typography variant="subtitle2" style={{ marginBottom: '8px' }}>
             Choose a time in the video, then press one of the UI keys below. Once set, pressing that key on your physical keyboard jumps to that timestamp.
           </Typography>
-
+          <div style={{ marginBottom: '8px'}}>
+            <Tooltip title="Stop playback when key is released">
+            <FormControlLabel control={<Checkbox checked={momentaryMode} onChange={handleMomentaryModeChange} />} label="Momentary keys" />
+            </Tooltip>
+          </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <button className="kbc-button kbc-button-xs">K</button>
             <span>Play/pause</span>
