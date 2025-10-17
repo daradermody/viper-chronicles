@@ -1,5 +1,5 @@
 import { Episode } from '../types'
-import {useCallback, useEffect, useMemo, useState} from 'react'
+import { useCallback, useEffect, useMemo, useState, useRef} from 'react'
 import { YouTubePlayer } from 'youtube-player/dist/types'
 import YTPlayer from 'youtube-player'
 import PlayerStates from 'youtube-player/dist/constants/PlayerStates'
@@ -63,11 +63,14 @@ function YouTubeKeyControl({ player }: { player: YouTubePlayer }) {
   const { show, season, episode: episodeNumber } = useParams<{ show: 'computerChronicles' | 'netCafe'; season: string; episode: string }>()
   const { episode } = useEpisode(show!, Number(season), Number(episodeNumber))!
   const { timestamps, loading, setTimestamps } = useTimestamps(show!, episode.id)
+  const pressing = useRef(0)
 
   useEffect(() => {
     async function handleKeydown(e: KeyboardEvent) {
+      if(e.repeat) return // stop repeating events 
       if ((e.target as any)?.tagName !== 'INPUT') {
         if (timestamps?.[e.key]) {
+          pressing.current = Date.now()
           player?.seekTo(timestamps[e.key].time, true)
           player?.playVideo()
         } if (e.code === 'Space' || e.code === 'KeyK') {
@@ -87,8 +90,21 @@ function YouTubeKeyControl({ player }: { player: YouTubePlayer }) {
         }
       }
     }
+    async function handleKeyup(e: KeyboardEvent){
+      if ((e.target as any)?.tagName !== 'INPUT' && timestamps?.[e.key]) {
+        const now = Date.now();
+        if (now - pressing.current > 300) {
+          pressing.current = now;
+          player?.pauseVideo()
+        }
+      }
+    }
     document.addEventListener('keydown', handleKeydown)
-    return () => document.removeEventListener('keydown', handleKeydown)
+    document.addEventListener('keyup', handleKeyup)
+    return () => {
+      document.removeEventListener('keydown', handleKeydown)
+      document.removeEventListener('keyup', handleKeyup)
+    }
   }, [player, timestamps])
 
   return (
@@ -104,7 +120,6 @@ function YouTubeKeyControl({ player }: { player: YouTubePlayer }) {
           <Typography variant="subtitle2" style={{ marginBottom: '8px' }}>
             Choose a time in the video, then press one of the UI keys below. Once set, pressing that key on your physical keyboard jumps to that timestamp.
           </Typography>
-
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <button className="kbc-button kbc-button-xs">K</button>
             <span>Play/pause</span>
