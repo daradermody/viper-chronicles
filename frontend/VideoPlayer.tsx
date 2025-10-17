@@ -1,5 +1,5 @@
 import { Episode } from '../types'
-import {KeyboardEvent, useCallback, useEffect, useMemo, useState, useRef} from 'react'
+import { useCallback, useEffect, useMemo, useState, useRef} from 'react'
 import { YouTubePlayer } from 'youtube-player/dist/types'
 import YTPlayer from 'youtube-player'
 import PlayerStates from 'youtube-player/dist/constants/PlayerStates'
