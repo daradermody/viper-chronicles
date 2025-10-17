@@ -91,7 +91,7 @@ function YouTubeKeyControl({ player }: { player: YouTubePlayer }) {
       }
     }
     async function handleKeyup(e: KeyboardEvent){
-      if ((e.target as any)?.tagName !== 'INPUT') {
+      if ((e.target as any)?.tagName !== 'INPUT' && timestamps?.[e.key]) {
         const now = Date.now();
         if (now - pressing.current > 300) {
           pressing.current = now;
