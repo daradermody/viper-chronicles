@@ -4,7 +4,7 @@ import { Close } from '@mui/icons-material'
 import backgroundMusicSoundboard from './background_music_soundboard.png'
 import nameTimestamps from './name_timestamps.png'
 
-export const LATEST_VERSION = 3
+export const LATEST_VERSION = 4
 
 export function WebsiteUpdates({ onClose }: { onClose: () => void }) {
   return (
@@ -31,6 +31,14 @@ export function WebsiteUpdates({ onClose }: { onClose: () => void }) {
         </Typography>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', overflowY: 'auto', maxHeight: '80vh' }}>
+          <Update title="Background music times 1,000">
+            Now you can use any YouTube link as background music.
+          </Update>
+
+          <Update title="Hold to play, release to pause" credit="jacksonv1lle">
+            Now if you hold down timestamp keys, the video will pause when you release the key. Tapping the key still works as before.
+          </Update>
+
           <Update title="Remember the time">
             Video timestamps are now saved permanently (but only if you're logged in!)
           </Update>
@@ -62,7 +70,7 @@ export function WebsiteUpdates({ onClose }: { onClose: () => void }) {
   )
 }
 
-function Update({ title, children }: { title: string; children: ReactNode }) {
+function Update({ title, credit, children }: { title: string; credit?: string; children: ReactNode }) {
   return (
     <Card sx={{ minWidth: 275, flexShrink: 0 }} variant="outlined">
       <CardContent>
@@ -70,6 +78,11 @@ function Update({ title, children }: { title: string; children: ReactNode }) {
           {title}
         </Typography>
         {children}
+        {credit && (
+          <Typography sx={{ margin: '16px 0 -16px' }} variant="subtitle2" color="text.secondary">
+            <i>Thanks to {credit} for the contribution.</i>
+          </Typography>
+        )}
       </CardContent>
     </Card>
   )
