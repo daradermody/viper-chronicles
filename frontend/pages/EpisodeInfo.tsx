@@ -30,10 +30,12 @@ export default function EpisodeInfo() {
       </Typography>
 
       {isLoggedIn && (
-        <FormControlLabel
-          control={<Checkbox checked={watched} onChange={e => setWatched(e.target.checked)}/>}
-          label={<Typography variant="caption" sx={{ marginTop: '4px' }}>Watched</Typography>}
-        />
+        <div>
+          <FormControlLabel
+            control={<Checkbox checked={watched} onChange={e => setWatched(e.target.checked)}/>}
+            label={<Typography variant="caption" sx={{ marginTop: '4px' }}>Watched</Typography>}
+          />
+        </div>
       )}
 
       <VideoPlayer key={episode.id} episode={episode}/>
