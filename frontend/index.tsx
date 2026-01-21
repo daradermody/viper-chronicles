@@ -13,6 +13,8 @@ import { DataProvider } from './data/DataProvider'
 import { AuthProvider } from './AuthProvider'
 import { Header } from './header/Header'
 import { Footer } from './Footer'
+import YoutubeVideoList from './pages/YoutubeVideoList'
+import YoutubeVideo from './pages/YoutubeVideo'
 
 const elem = document.getElementById('root')!
 const app = (
@@ -27,6 +29,8 @@ const app = (
                 <Route path="/" element={<Home/>}/>
                 <Route path="/computerChronicles" element={<ComputerChroniclesSeasonList/>}/>
                 <Route path="/netCafe" element={<NetCafeSeasonList/>}/>
+                <Route path="/youtube" element={<YoutubeVideoList/>}/>
+                <Route path="/youtube/:id" element={<YoutubeVideo/>}/>
                 <Route path="/:show/season/:season" element={<EpisodeList/>}/>
                 <Route path="/:show/season/:season/episode/:episode" element={<EpisodeInfo/>}/>
               </Routes>

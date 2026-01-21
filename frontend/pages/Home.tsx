@@ -28,6 +28,16 @@ export default function Home() {
             description="A spin-off of Computer Chronicles, Net Cafe (or Cheifet's Net Cafe or The Internet Cafe) was a US television series documenting the internet boom of the late 1990s"
           />
         </Card>
+        <Card linkTo="/youtube">
+          <CardMedia
+            image="https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/YouTube_full-color_icon_%282017%29.svg/960px-YouTube_full-color_icon_%282017%29.svg.png"
+            alt="YouTube videos"
+          />
+          <CardContent
+            title="YouTube videos"
+            description="Videos you've saved from YouTube"
+          />
+        </Card>
       </div>
     </div>
   )

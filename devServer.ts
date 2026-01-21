@@ -7,6 +7,7 @@ import * as netCafeWatchedEpisodesRoutes from './api/netCafe/watchedEpisodes'
 import * as loginRoutes from './api/login'
 import * as soundBoardRoutes from './api/soundboard/[type]'
 import * as timestampRoutes from './api/timestamps/[show]/[episode]'
+import * as youtubeVideosRoutes from './api/youtube/videos'
 
 const server = serve({
   routes: {
@@ -15,6 +16,7 @@ const server = serve({
     '/api/computerChronicles/watchedEpisodes': computerChroniclesWatchedEpisodesRoutes,
     '/api/netCafe/episodes': netCafeEpisodesRoutes,
     '/api/netCafe/watchedEpisodes': netCafeWatchedEpisodesRoutes,
+    '/api/youtube/videos': youtubeVideosRoutes,
     '/api/login': loginRoutes,
     '/api/soundboard/:type': {
       GET: req => {

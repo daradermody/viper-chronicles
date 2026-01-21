@@ -6,26 +6,10 @@ import PlayerStates from 'youtube-player/dist/constants/PlayerStates'
 import { IconButton, Popover, TextField, Tooltip, Typography } from '@mui/material'
 import {Keyboard, Edit, Check, Delete} from '@mui/icons-material'
 import {useAuth} from './AuthProvider'
-import {useParams} from 'react-router-dom'
-import {useEpisode} from './data/DataProvider'
 
-export function VideoPlayer({ episode }: { episode: Episode }) {
-  const [player, setPlayer] = useState<YouTubePlayer>()
-
-  useEffect(() => {
-    if (episode.youtubeId) {
-      const player = YTPlayer('yt-player', { videoId: episode.youtubeId });
-      setPlayer(player)
-    }
-  }, [episode])
-
+export function VideoPlayer({ show, episode }: { show: 'computerChronicles' | 'netCafe'; episode: Episode }) {
   if (episode.youtubeId) {
-    return (
-      <div style={{ width: '100%', display: 'flex', gap: '8px' }}>
-        <div id="yt-player" style={{ maxWidth: '100%', width: '800px', height: '600px' }}/>
-        {player && <YouTubeKeyControl player={player}/>}
-      </div>
-    )
+    return <YouTubePlayer show={show} videoId={episode.youtubeId} episodeId={episode.id}/>
   } else if (episode.archiveOrgId) {
     return (
       <div className="video-container video-spinner">
@@ -50,6 +34,24 @@ export function VideoPlayer({ episode }: { episode: Episode }) {
   }
 }
 
+export function YouTubePlayer({ videoId, show, episodeId }: { videoId: string, show: 'computerChronicles' | 'netCafe' | 'youtube'; episodeId: string }) {
+  const [player, setPlayer] = useState<YouTubePlayer>()
+
+  useEffect(() => {
+    if (videoId) {
+      const player = YTPlayer('yt-player', { videoId });
+      setPlayer(player)
+    }
+  }, [videoId])
+
+  return (
+    <div style={{ width: '100%', display: 'flex', gap: '8px' }}>
+      <div id="yt-player" style={{ maxWidth: '100%', width: '800px', height: '600px' }}/>
+      {player && <YouTubeKeyControl player={player} show={show} episodeId={episodeId}/>}
+    </div>
+  )
+}
+
 const numberKeys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0']
 const letterKeys = ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p']
 
@@ -58,11 +60,15 @@ interface Timestamp {
   name?: string;
 }
 
-function YouTubeKeyControl({ player }: { player: YouTubePlayer }) {
+interface YouTubeKeyControlProps {
+  player: YouTubePlayer;
+  show: 'computerChronicles' | 'netCafe' | 'youtube';
+  episodeId: string;
+}
+
+function YouTubeKeyControl({ player, show, episodeId }: YouTubeKeyControlProps) {
   const [showYtControls, setShowYtControls] = useState(false)
-  const { show, season, episode: episodeNumber } = useParams<{ show: 'computerChronicles' | 'netCafe'; season: string; episode: string }>()
-  const { episode } = useEpisode(show!, Number(season), Number(episodeNumber))!
-  const { timestamps, loading, setTimestamps } = useTimestamps(show!, episode.id)
+  const { timestamps, loading, setTimestamps } = useTimestamps(show, episodeId)
   const pressing = useRef(0)
 
   useEffect(() => {
@@ -340,7 +346,7 @@ function toSeconds(timestamp: string): number {
   return seconds;
 }
 
-function useTimestamps(show: 'computerChronicles' | 'netCafe', episodeId: string): UseTimestampsResult {
+function useTimestamps(show: 'computerChronicles' | 'netCafe' | 'youtube', episodeId: string): UseTimestampsResult {
   const [timestamps, setTimestamps] = useState<Record<string, Timestamp>>()
   const [loading, setLoading] = useState(true)
   const {isLoggedIn, password} = useAuth()

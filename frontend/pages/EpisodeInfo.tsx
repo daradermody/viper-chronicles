@@ -17,7 +17,7 @@ export default function EpisodeInfo() {
     <div style={{ display: 'flex', flexDirection: 'column' }}>
       <div style={{ display: 'flex', gap: '4px' }}>
         <Link to={`/${show}/season/${season}`}>
-          <IconButton aria-label="Back to episode list list"><ArrowBack/></IconButton>
+          <IconButton aria-label="Back to episode list"><ArrowBack/></IconButton>
         </Link>
 
         <Typography variant="h4" style={{ marginBottom: '16px', display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
@@ -38,7 +38,7 @@ export default function EpisodeInfo() {
         </div>
       )}
 
-      <VideoPlayer key={episode.id} episode={episode}/>
+      <VideoPlayer key={episode.id} show={show!} episode={episode}/>
     </div>
   )
 }

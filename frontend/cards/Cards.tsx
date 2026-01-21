@@ -62,9 +62,10 @@ interface CardContentProps {
   subtitle?: string;
   description?: string;
   actions?: ReactNode[];
+  actionsOnEnd?: boolean;
 }
 
-export function CardContent({ title, subtitle, description, actions }: CardContentProps) {
+export function CardContent({ title, subtitle, description, actions, actionsOnEnd }: CardContentProps) {
   return (
     <div className="card-content">
       {title && typeof title === 'string' && (
@@ -86,11 +87,15 @@ export function CardContent({ title, subtitle, description, actions }: CardConte
         </Typography>
       )}
 
-      {actions && actions.map((action, i) => (
-        <div key={i} onClick={e => e.stopPropagation()}>
-          {action}
+      {actions?.length && (
+        <div style={{ display: 'flex', justifyContent: actionsOnEnd ? 'flex-end' : 'flex-start' }}>
+          {actions.map((action, i) => (
+            <div key={i} onClick={e => e.stopPropagation()}>
+              {action}
+            </div>
+          ))}
         </div>
-      ))}
+      )}
     </div>
   )
 }

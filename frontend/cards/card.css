@@ -41,6 +41,7 @@
   margin: 8px 12px;
   display: flex;
   flex-direction: column;
+  flex-grow: 1;
 }
 
 .card-description {
@@ -48,6 +49,7 @@
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  overflow-wrap: anywhere;
 }
 
 

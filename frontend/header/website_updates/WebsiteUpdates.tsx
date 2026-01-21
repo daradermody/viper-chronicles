@@ -4,7 +4,7 @@ import { Close } from '@mui/icons-material'
 import backgroundMusicSoundboard from './background_music_soundboard.png'
 import nameTimestamps from './name_timestamps.png'
 
-export const LATEST_VERSION = 4
+export const LATEST_VERSION = 5
 
 export function WebsiteUpdates({ onClose }: { onClose: () => void }) {
   return (
@@ -31,6 +31,10 @@ export function WebsiteUpdates({ onClose }: { onClose: () => void }) {
         </Typography>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', overflowY: 'auto', maxHeight: '80vh' }}>
+          <Update title="YouTube support!">
+            Save YouTube links and play them with the same timestamping features as regular episodes.
+          </Update>
+
           <Update title="Background music times 1,000">
             Now you can use any YouTube link as background music.
           </Update>
