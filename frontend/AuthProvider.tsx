@@ -111,6 +111,7 @@ function LoginButton({ isCheckingSavedCredentials, onSubmit }: { isCheckingSaved
         open={!!anchorEl}
         anchorEl={anchorEl}
         onClose={() => setAnchorEl(null)}
+        onClick={e => e.stopPropagation()}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
         onFocus={() => document.getElementById('password-field')?.focus()}

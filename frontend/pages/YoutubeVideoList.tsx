@@ -119,7 +119,7 @@ function parseYoutubeVideoId(url: string): string | null {
 
 function VideoList({ videos, onDelete }: { videos: YoutubeVideo[], onDelete: (id: string) => void | Promise<void> }) {
   if (videos.length === 0) {
-    return <p>No videos added yet.</p>
+    return <p>No videos added yet. Add one with the button on the right.</p>
   }
 
   return (
